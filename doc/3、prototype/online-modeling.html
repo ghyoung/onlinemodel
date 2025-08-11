@@ -137,76 +137,10 @@
         }
         
         .sidebar {
-            width: 300px;
-            background: #fff;
-            border-right: 1px solid #e8e8e8;
-            display: flex;
-            flex-direction: column;
+            display: none; /* 移除侧边栏区域 */
         }
         
-        .sidebar-tabs {
-            display: flex;
-            border-bottom: 1px solid #e8e8e8;
-        }
-        
-        .sidebar-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .sidebar-tab.active {
-            border-bottom-color: #1890ff;
-            color: #1890ff;
-        }
-        
-        .sidebar-content {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-        }
-        
-        .field-item {
-            padding: 12px;
-            border: 1px solid #f0f0f0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            background: #fafafa;
-            cursor: move;
-        }
-        
-        .field-item:hover {
-            border-color: #1890ff;
-            background: #f0f8ff;
-        }
-        
-        .field-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .field-name {
-            font-weight: 600;
-            color: #262626;
-        }
-        
-        .field-type {
-            font-size: 12px;
-            color: #8c8c8c;
-            background: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        
-        .field-description {
-            font-size: 12px;
-            color: #595959;
-        }
+        /* 移除字段库侧边样式 */
         
         .table-editor {
             flex: 1;
@@ -219,6 +153,294 @@
             padding: 16px 24px;
             border-bottom: 1px solid #e8e8e8;
             background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+        
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        
+        .table-props {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+        }
+        
+        .table-props label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #595959;
+        }
+        
+        .prop-select {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fff;
+        }
+        
+        .autosave-hint {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .table-title {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .table-title:hover {
+            background: #f0f8ff;
+        }
+        
+        .table-title[data-editing="true"] {
+            background: #fff;
+            border: none;
+        }
+        
+        .table-name {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .table-description {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            margin-top: 4px;
+        }
+        
+        .table-description:hover {
+            background: #f0f8ff;
+        }
+        
+        .table-description[data-editing="true"] {
+            background: #fff;
+            border: none;
+        }
+        
+        .title-edit-input {
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        
+        .title-edit-input:focus {
+            border-color: #40a9ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        /* 抽屉样式 */
+        .drawer {
+            position: fixed;
+            top: 64px;
+            right: 0;
+            width: 420px;
+            height: calc(100vh - 64px);
+            background: #fff;
+            border-left: 1px solid #e8e8e8;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.06);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+        
+        .drawer-header {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .drawer-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #8c8c8c;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #262626;
+        }
+        
+        .drawer-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+        }
+        
+        .search-box {
+            margin-bottom: 16px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .field-list {
+            margin-bottom: 16px;
+        }
+        
+        .column-list {
+            margin-bottom: 16px;
+        }
+        
+        .column-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+        
+        .column-item input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .drawer-footer {
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .primary-btn {
+            background: #1890ff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .primary-btn:hover {
+            background: #40a9ff;
+        }
+        
+        /* 快速导入样式 */
+        .import-tabs {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 16px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            border-bottom-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #f5f5f5;
+        }
+        
+        .tab-content {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .tab-pane {
+            display: none;
+            height: 100%;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .import-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+        }
+        
+        .import-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .import-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .import-item.selected {
+            background: #e6f7ff;
+            border-left: 3px solid #1890ff;
+        }
+        
+        .import-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .import-item-name {
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .import-item-type {
+            font-size: 12px;
+            color: #8c8c8c;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .import-item-desc {
+            font-size: 12px;
+            color: #8c8c8c;
         }
         
         .table-title {
@@ -237,17 +459,66 @@
             flex: 1;
             padding: 24px;
             overflow: auto;
+            position: relative;
         }
         
         .table-container {
             border: 1px solid #e8e8e8;
             border-radius: 8px;
             overflow: hidden;
+            width: 100%;
+            min-width: 2000px; /* 设置最小宽度确保横向滚动 */
+            position: relative;
+        }
+        
+        /* 确保表格容器有横向滚动条 */
+        .table-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .table-grid::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .table-grid::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .table-grid::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
         
         .table-header-row {
+            display: flex;
             background: #fafafa;
             border-bottom: 1px solid #e8e8e8;
+            min-width: 2000px; /* 与容器保持一致 */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            min-width: 2000px; /* 与容器保持一致 */
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        
+        .table-row:hover {
+            background: #fafafa;
+        }
+        
+        .table-row.selected {
+            background: #e6f7ff;
+            border-left: 3px solid #1890ff;
+        }
+        
+        .table-row.focused {
+            background: #f0f8ff;
         }
         
         .table-header-cell {
@@ -256,19 +527,16 @@
             color: #262626;
             border-right: 1px solid #e8e8e8;
             min-width: 120px;
+            text-align: center;
+            white-space: nowrap;
+            flex-shrink: 0; /* 防止列被压缩 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .table-header-cell:last-child {
             border-right: none;
-        }
-        
-        .table-row {
-            border-bottom: 1px solid #f0f0f0;
-            display: flex;
-        }
-        
-        .table-row:hover {
-            background: #fafafa;
         }
         
         .table-cell {
@@ -277,11 +545,36 @@
             min-width: 120px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* 防止列被压缩 */
+            transition: background-color 0.2s;
         }
         
         .table-cell:last-child {
             border-right: none;
         }
+        
+        .table-cell.focused {
+            background: #f0f8ff;
+        }
+        
+        /* 确保每列的宽度一致 */
+        .table-header-cell:nth-child(1), .table-cell:nth-child(1) { min-width: 120px; }
+        .table-header-cell:nth-child(2), .table-cell:nth-child(2) { min-width: 120px; }
+        .table-header-cell:nth-child(3), .table-cell:nth-child(3) { min-width: 100px; }
+        .table-header-cell:nth-child(4), .table-cell:nth-child(4) { min-width: 100px; }
+        .table-header-cell:nth-child(5), .table-cell:nth-child(5) { min-width: 80px; }
+        .table-header-cell:nth-child(6), .table-cell:nth-child(6) { min-width: 80px; }
+        .table-header-cell:nth-child(7), .table-cell:nth-child(7) { min-width: 100px; }
+        .table-header-cell:nth-child(8), .table-cell:nth-child(8) { min-width: 80px; }
+        .table-header-cell:nth-child(9), .table-cell:nth-child(9) { min-width: 120px; }
+        .table-header-cell:nth-child(10), .table-cell:nth-child(10) { min-width: 200px; }
+        .table-header-cell:nth-child(11), .table-cell:nth-child(11) { min-width: 120px; }
+        .table-header-cell:nth-child(12), .table-cell:nth-child(12) { min-width: 120px; }
+        .table-header-cell:nth-child(13), .table-cell:nth-child(13) { min-width: 120px; }
+        .table-header-cell:nth-child(14), .table-cell:nth-child(14) { min-width: 120px; }
+        .table-header-cell:nth-child(15), .table-cell:nth-child(15) { min-width: 150px; }
+        .table-header-cell:nth-child(16), .table-cell:nth-child(16) { min-width: 100px; }
         
         .cell-input {
             border: none;
@@ -365,6 +658,7 @@
             padding: 8px 16px;
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
         }
         
         .field-type-option:hover {
@@ -382,6 +676,26 @@
             font-weight: 600;
             color: #262626;
             border-bottom: 1px solid #e8e8e8;
+            font-size: 12px;
+        }
+        
+        /* 字段类型单元格样式 */
+        [data-field="type"] {
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+        }
+        
+        [data-field="type"]:hover {
+            background: #f0f8ff;
+            border-radius: 4px;
+        }
+        
+        [data-field="type"]::after {
+            content: '▼';
+            font-size: 10px;
+            color: #8c8c8c;
+            margin-left: 4px;
         }
         
         .validation-error {
@@ -400,30 +714,7 @@
             border: 2px dashed #1890ff;
         }
         
-        .field-constraints {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        
-        .constraint-tag {
-            padding: 2px 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            font-size: 12px;
-            color: #595959;
-            cursor: pointer;
-        }
-        
-        .constraint-tag:hover {
-            background: #e6f7ff;
-            color: #1890ff;
-        }
-        
-        .constraint-tag.active {
-            background: #1890ff;
-            color: #fff;
-        }
+        /* 移除约束标签交互样式，使用是否主键列替代 */
         
         .table-properties {
             background: #fafafa;
@@ -458,14 +749,7 @@
         }
         
         .collaboration-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #f6ffed;
-            border: 1px solid #b7eb8f;
-            border-radius: 6px;
-            margin-bottom: 16px;
+            display: none; /* 暂不展示在线协作用户 */
         }
         
         .user-avatar {
@@ -505,123 +789,52 @@
     <div class="modeling-container">
         <div class="toolbar">
             <div class="toolbar-left">
-                <input type="text" class="table-name-input" placeholder="输入表名..." value="user_profile">
+                <button class="toolbar-btn" id="backBtn">← 返回</button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn" id="saveBtn">
-                    💾 保存
-                </button>
-                <div class="undo-redo-stack">
-                    <button class="toolbar-btn" id="undoBtn" disabled>
-                        ↩️ 撤销
-                    </button>
-                    <button class="toolbar-btn" id="redoBtn" disabled>
-                        ↪️ 重做
-                    </button>
-                    <span class="stack-indicator">撤销: 0 | 重做: 0</span>
-                </div>
+                <button class="toolbar-btn" id="openFieldLibBtn">📚 标准字段库</button>
                 <div class="toolbar-divider"></div>
-                <button class="toolbar-btn">
-                    📥 导入
-                </button>
-                <button class="toolbar-btn">
-                    📤 导出
-                </button>
-                <button class="toolbar-btn">
-                    🔍 预览SQL
-                </button>
+                <button class="toolbar-btn" id="columnVisibilityBtn">👁️ 列可见性</button>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="quickImportBtn">📥 快速导入</button>
             </div>
             
             <div class="toolbar-right">
-                <div class="collaboration-status">
+                <div class="collaboration-status" id="autosaveStatus">
                     <div class="status-dot"></div>
-                    实时协作中 - 3人在线
+                    正在自动保存...
                 </div>
-                <button class="toolbar-btn primary">
-                    🚀 发布模型
-                </button>
             </div>
         </div>
         
+        <!-- 使用提示 -->
+        <div class="usage-tips" style="background: #f6ffed; border: 1px solid #b7eb8f; padding: 8px 24px; font-size: 12px; color: #52c41a;">
+            💡 使用提示：点击字段类型可切换类型 | 使用 Tab/Enter 键在单元格间导航 | Ctrl+S 手动保存 | Delete 删除选中行
+        </div>
+        
         <div class="main-content">
-            <div class="sidebar">
-                <div class="sidebar-tabs">
-                    <div class="sidebar-tab active">字段库</div>
-                    <div class="sidebar-tab">关系</div>
-                    <div class="sidebar-tab">索引</div>
-                    <div class="sidebar-tab">模板</div>
-                </div>
-                
-                <div class="sidebar-content">
-                    <div class="field-item" draggable="true" data-field-type="BIGINT">
-                        <div class="field-header">
-                            <span class="field-name">id</span>
-                            <span class="field-type">BIGINT</span>
-                        </div>
-                        <div class="field-description">主键ID，自增</div>
-                    </div>
-                    
-                    <div class="field-item" draggable="true" data-field-type="VARCHAR">
-                        <div class="field-header">
-                            <span class="field-name">name</span>
-                            <span class="field-type">VARCHAR(100)</span>
-                        </div>
-                        <div class="field-description">用户姓名</div>
-                    </div>
-                    
-                    <div class="field-item" draggable="true" data-field-type="VARCHAR">
-                        <div class="field-header">
-                            <span class="field-name">email</span>
-                            <span class="field-type">VARCHAR(255)</span>
-                        </div>
-                        <div class="field-description">邮箱地址</div>
-                    </div>
-                    
-                    <div class="field-item" draggable="true" data-field-type="TIMESTAMP">
-                        <div class="field-header">
-                            <span class="field-name">created_at</span>
-                            <span class="field-type">TIMESTAMP</span>
-                        </div>
-                        <div class="field-description">创建时间</div>
-                    </div>
-                    
-                    <div class="field-item" draggable="true" data-field-type="TIMESTAMP">
-                        <div class="field-header">
-                            <span class="field-name">updated_at</span>
-                            <span class="field-type">TIMESTAMP</span>
-                        </div>
-                        <div class="field-description">更新时间</div>
-                    </div>
-                </div>
-            </div>
+            <!-- 移除侧边栏（字段库/关系/索引/模板） --><!-- 留空占位删除 -->
             
             <div class="table-editor">
                 <div class="table-header">
-                    <div class="table-title">用户档案表 (user_profile)</div>
-                    <div class="table-description">存储用户基本信息和档案数据</div>
+                    <div class="header-left">
+                        <div class="table-title" id="tableTitle" data-editing="false">
+                            <span class="title-text">用户档案表</span>
+                            <span class="title-separator"> (</span>
+                            <span class="table-name" id="tableName" data-editing="false">dwd_user_profile</span>
+                            <span class="title-separator">)</span>
+                        </div>
+                        <div class="table-description" id="tableDesc" data-editing="false">存储用户基本信息和档案数据</div>
+                    </div>
+                    <div class="header-right">
+                        <div class="table-props">
+                            <label>分层: <select id="layerSelect" class="prop-select"><option>ODS</option><option selected>DWD</option><option>DIM</option><option>DWS</option><option>ADS</option></select></label>
+                            <label>主题域: <select id="themeSelect" class="prop-select"><option selected>用户域</option><option>订单域</option><option>商品域</option><option>营销域</option></select></label>
+                        </div>
+                        <div id="autosaveHint" class="autosave-hint">已自动保存 2024-01-15 15:30</div>
+                    </div>
                 </div>
                 
-                <div class="table-properties">
-                    <div class="property-row">
-                        <div class="property-label">表注释:</div>
-                        <input type="text" class="property-input" value="用户档案表" placeholder="输入表注释...">
-                    </div>
-                    <div class="property-row">
-                        <div class="property-label">存储引擎:</div>
-                        <select class="property-input">
-                            <option>InnoDB</option>
-                            <option>MyISAM</option>
-                            <option>Memory</option>
-                        </select>
-                    </div>
-                    <div class="property-row">
-                        <div class="property-label">字符集:</div>
-                        <select class="property-input">
-                            <option>utf8mb4</option>
-                            <option>utf8</option>
-                            <option>latin1</option>
-                        </select>
-                    </div>
-                </div>
+                <!-- 移除原有的table-properties区域，信息已整合到表头 -->
                 
                 <div class="collaboration-indicator">
                     <span>👥 当前在线用户:</span>
@@ -636,37 +849,29 @@
                 <div class="table-grid">
                     <div class="table-container">
                         <div class="table-header-row">
-                            <div class="table-header-cell">字段名</div>
-                            <div class="table-header-cell">数据类型</div>
+                            <div class="table-header-cell">字段英文</div>
+                            <div class="table-header-cell">字段中文</div>
+                            <div class="table-header-cell">是否已配置</div>
+                            <div class="table-header-cell">字段类型</div>
                             <div class="table-header-cell">长度/值</div>
                             <div class="table-header-cell">是否为空</div>
                             <div class="table-header-cell">默认值</div>
-                            <div class="table-header-cell">注释</div>
-                            <div class="table-header-cell">约束</div>
+                            <div class="table-header-cell">是否主键</div>
+                            <div class="table-header-cell">字段描述</div>
+                            <div class="table-header-cell">来源系统</div>
+                            <div class="table-header-cell">来源数据库</div>
+                            <div class="table-header-cell">来源表</div>
+                            <div class="table-header-cell">来源字段</div>
+                            <div class="table-header-cell">来源字段类型</div>
+                            <div class="table-header-cell">计算规则</div>
                             <div class="table-header-cell">操作</div>
                         </div>
                         
                         <div class="table-row" data-field-id="1">
-                            <div class="table-cell">
-                                <input type="text" class="cell-input" value="id" data-field="name">
-                            </div>
-                            <div class="table-cell">
-                                <div class="field-type-selector">
-                                    <span class="cell-input" data-field="type">BIGINT</span>
-                                    <div class="field-type-dropdown" style="display: none;">
-                                        <div class="field-type-category">数值类型</div>
-                                        <div class="field-type-option" data-type="BIGINT">BIGINT</div>
-                                        <div class="field-type-option" data-type="INT">INT</div>
-                                        <div class="field-type-option" data-type="SMALLINT">SMALLINT</div>
-                                        <div class="field-type-category">字符串类型</div>
-                                        <div class="field-type-option" data-type="VARCHAR">VARCHAR</div>
-                                        <div class="field-type-option" data-type="CHAR">CHAR</div>
-                                        <div class="field-type-category">时间类型</div>
-                                        <div class="field-type-option" data-type="TIMESTAMP">TIMESTAMP</div>
-                                        <div class="field-type-option" data-type="DATETIME">DATETIME</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="id" data-field="name_en"></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="主键ID" data-field="name_zh"></div>
+                            <div class="table-cell"><input type="checkbox" checked></div>
+                            <div class="table-cell"><span class="cell-input" data-field="type">BIGINT</span></div>
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="" data-field="length">
                             </div>
@@ -679,32 +884,53 @@
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="AUTO_INCREMENT" data-field="default">
                             </div>
+                            <div class="table-cell"><select class="cell-input" data-field="is_pk"><option selected>是</option><option>否</option></select></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="主键ID，自增" data-field="description"></div>
                             <div class="table-cell">
-                                <input type="text" class="cell-input" value="主键ID，自增" data-field="comment">
+                                <select class="cell-input">
+                                    <option selected>CRM</option>
+                                    <option>生产环境PostgreSQL</option>
+                                    <option>测试环境MySQL</option>
+                                </select>
                             </div>
                             <div class="table-cell">
-                                <div class="field-constraints">
-                                    <span class="constraint-tag active">PK</span>
-                                    <span class="constraint-tag">AI</span>
-                                </div>
+                                <select class="cell-input">
+                                    <option selected>db1</option>
+                                    <option>warehouse</option>
+                                </select>
                             </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option>public</option>
+                                    <option>ods</option>
+                                    <option selected>dwd</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option selected>t_user</option>
+                                    <option>user_profile</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option selected>id</option>
+                                    <option>name</option>
+                                </select>
+                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="" placeholder="DWS/ADS 填写聚合或表达式"></div>
                             <div class="table-cell">
                                 <div class="field-actions">
-                                    <button class="field-action-btn">编辑</button>
                                     <button class="field-action-btn danger">删除</button>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="table-row" data-field-id="2">
-                            <div class="table-cell">
-                                <input type="text" class="cell-input" value="name" data-field="name">
-                            </div>
-                            <div class="table-cell">
-                                <div class="field-type-selector">
-                                    <span class="cell-input" data-field="type">VARCHAR</span>
-                                </div>
-                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="name" data-field="name_en"></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="姓名" data-field="name_zh"></div>
+                            <div class="table-cell"><input type="checkbox"></div>
+                            <div class="table-cell"><span class="cell-input" data-field="type">VARCHAR</span></div>
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="100" data-field="length">
                             </div>
@@ -717,31 +943,53 @@
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="" data-field="default">
                             </div>
+                            <div class="table-cell"><select class="cell-input" data-field="is_pk"><option>是</option><option selected>否</option></select></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="用户姓名" data-field="description"></div>
                             <div class="table-cell">
-                                <input type="text" class="cell-input" value="用户姓名" data-field="comment">
+                                <select class="cell-input">
+                                    <option selected>CRM</option>
+                                    <option>生产环境PostgreSQL</option>
+                                    <option>测试环境MySQL</option>
+                                </select>
                             </div>
                             <div class="table-cell">
-                                <div class="field-constraints">
-                                    <span class="constraint-tag">UQ</span>
-                                </div>
+                                <select class="cell-input">
+                                    <option selected>db1</option>
+                                    <option>windows</option>
+                                </select>
                             </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option>public</option>
+                                    <option>ods</option>
+                                    <option selected>dwd</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option selected>t_user</option>
+                                    <option>user_profile</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option>id</option>
+                                    <option selected>name</option>
+                                </select>
+                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value=""></div>
                             <div class="table-cell">
                                 <div class="field-actions">
-                                    <button class="field-action-btn">编辑</button>
                                     <button class="field-action-btn danger">删除</button>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="table-row" data-field-id="3">
-                            <div class="table-cell">
-                                <input type="text" class="cell-input" value="email" data-field="name">
-                            </div>
-                            <div class="table-cell">
-                                <div class="field-type-selector">
-                                    <span class="cell-input" data-field="type">VARCHAR</span>
-                                </div>
-                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="email" data-field="name_en"></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="邮箱" data-field="name_zh"></div>
+                            <div class="table-cell"><input type="checkbox"></div>
+                            <div class="table-cell"><span class="cell-input" data-field="type">VARCHAR</span></div>
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="255" data-field="length">
                             </div>
@@ -754,26 +1002,169 @@
                             <div class="table-cell">
                                 <input type="text" class="cell-input" value="" data-field="default">
                             </div>
+                            <div class="table-cell"><select class="cell-input" data-field="is_pk"><option>是</option><option selected>否</option></select></div>
+                            <div class="table-cell"><input type="text" class="cell-input" value="邮箱地址" data-field="description"></div>
                             <div class="table-cell">
-                                <input type="text" class="cell-input" value="邮箱地址" data-field="comment">
+                                <select class="cell-input">
+                                    <option selected>CRM</option>
+                                    <option>生产环境PostgreSQL</option>
+                                    <option>测试环境MySQL</option>
+                                </select>
                             </div>
                             <div class="table-cell">
-                                <div class="field-constraints">
-                                    <span class="constraint-tag">UQ</span>
-                                    <span class="constraint-tag">IDX</span>
-                                </div>
+                                <select class="cell-input">
+                                    <option selected>db1</option>
+                                    <option>warehouse</option>
+                                </select>
                             </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option>public</option>
+                                    <option>ods</option>
+                                    <option selected>dwd</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option selected>t_user</option>
+                                    <option>user_profile</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input">
+                                    <option>id</option>
+                                    <option>name</option>
+                                    <option selected>email</option>
+                                </select>
+                            </div>
+                            <div class="table-cell"><input type="text" class="cell-input" value=""></div>
                             <div class="table-cell">
                                 <div class="field-actions">
-                                    <button class="field-action-btn">编辑</button>
                                     <button class="field-action-btn danger">删除</button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="add-row-btn" id="addFieldBtn">
-                            + 添加字段
+                <div class="add-row-btn" id="addFieldBtn">+ 添加字段</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 字段库抽屉 -->
+            <div id="fieldLibDrawer" class="drawer">
+                <div class="drawer-header">
+                    <h3>标准字段库</h3>
+                    <button id="closeFieldLib" class="close-btn">×</button>
+                </div>
+                <div class="drawer-content">
+                    <div class="search-box">
+                        <input type="text" id="fieldSearch" placeholder="搜索字段...">
+                    </div>
+                    <div id="fieldLibList" class="field-list">
+                        <!-- 字段列表将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="drawer-footer">
+                        <button id="insertSelectedFields" class="primary-btn">插入选中字段</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 列可见性控制抽屉 -->
+            <div id="columnVisibilityDrawer" class="drawer">
+                <div class="drawer-header">
+                    <h3>列可见性设置</h3>
+                    <button id="closeColumnVisibility" class="close-btn">×</button>
+                </div>
+                <div class="drawer-content">
+                    <div class="column-list">
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="name_en"> 字段英文
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="name_zh"> 字段中文
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="configured"> 是否已配置
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="type"> 字段类型
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" data-column="length"> 长度/值
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" data-column="nullable"> 是否为空
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" data-column="default"> 默认值
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="is_pk"> 是否主键
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="description"> 字段描述
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="source_system"> 来源系统
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="source_database"> 来源数据库
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="source_table"> 来源表
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="source_field"> 来源字段
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="source_field_type"> 来源字段类型
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="calculation"> 计算规则
+                        </label>
+                        <label class="column-item">
+                            <input type="checkbox" checked data-column="actions"> 操作
+                        </label>
+                    </div>
+                    <div class="drawer-footer">
+                        <button id="applyColumnVisibility" class="primary-btn">应用设置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速导入字段抽屉 -->
+            <div id="quickImportDrawer" class="drawer">
+                <div class="drawer-header">
+                    <h3>快速导入字段</h3>
+                    <button id="closeQuickImport" class="close-btn">×</button>
+                </div>
+                <div class="drawer-content">
+                    <div class="import-tabs">
+                        <div class="tab-header">
+                            <button class="tab-btn active" data-tab="database">数据库表</button>
+                            <button class="tab-btn" data-tab="models">已有模型</button>
                         </div>
+                        <div class="tab-content">
+                            <div id="databaseTab" class="tab-pane active">
+                                <div class="search-box">
+                                    <input type="text" id="dbTableSearch" placeholder="搜索表名...">
+                                </div>
+                                <div id="dbTableList" class="import-list">
+                                    <!-- 数据库表列表将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                            <div id="modelsTab" class="tab-pane">
+                                <div class="search-box">
+                                    <input type="text" id="modelSearch" placeholder="搜索模型名...">
+                                </div>
+                                <div id="modelList" class="import-list">
+                                    <!-- 已有模型列表将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="drawer-footer">
+                        <button id="importSelectedFields" class="primary-btn">导入选中字段</button>
                     </div>
                 </div>
             </div>
@@ -781,6 +1172,488 @@
     </div>
 
     <script>
+        // 返回按钮功能
+        document.getElementById('backBtn').addEventListener('click', () => {
+            if (parent && parent.loadPage) {
+                parent.loadPage('model-management', '模型管理');
+            } else {
+                window.location.href = 'model-management.html';
+            }
+        });
+        
+        // 表头编辑功能
+        function makeEditable(element, field) {
+            element.addEventListener('click', () => {
+                if (element.getAttribute('data-editing') === 'true') return;
+                
+                const currentText = element.textContent;
+                
+                if (field === 'name') {
+                    // 中文名称编辑 - 创建独立的输入框
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = currentText;
+                    input.className = 'title-edit-input';
+                    input.style.width = '100%';
+                    input.style.border = '1px solid #1890ff';
+                    input.style.borderRadius = '4px';
+                    input.style.padding = '4px 8px';
+                    input.style.fontSize = '18px';
+                    input.style.fontWeight = '600';
+                    input.style.color = '#262626';
+                    input.style.backgroundColor = '#fff';
+                    
+                    element.setAttribute('data-editing', 'true');
+                    element.innerHTML = '';
+                    element.appendChild(input);
+                    input.focus();
+                    
+                    function saveEdit() {
+                        const newValue = input.value.trim();
+                        if (newValue) {
+                            element.innerHTML = `<span class="title-text">${newValue}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            element.setAttribute('data-editing', 'false');
+                            markDirty();
+                        } else {
+                            // 恢复原值
+                            element.innerHTML = `<span class="title-text">${currentText}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    }
+                    
+                    input.addEventListener('blur', saveEdit);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            saveEdit();
+                        } else if (e.key === 'Escape') {
+                            element.innerHTML = `<span class="title-text">${currentText}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    });
+                } else if (field === 'tableName') {
+                    // 英文表名编辑 - 创建独立的输入框
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = currentText;
+                    input.className = 'title-edit-input';
+                    input.style.width = '100%';
+                    input.style.border = '1px solid #1890ff';
+                    input.style.borderRadius = '4px';
+                    input.style.padding = '4px 8px';
+                    input.style.fontSize = '16px';
+                    input.style.fontWeight = '600';
+                    input.style.color = '#1890ff';
+                    input.style.backgroundColor = '#fff';
+                    
+                    element.setAttribute('data-editing', 'true');
+                    element.innerHTML = '';
+                    element.appendChild(input);
+                    input.focus();
+                    
+                    function saveEdit() {
+                        const newValue = input.value.trim();
+                        if (newValue) {
+                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${newValue}</span>`;
+                            element.setAttribute('data-editing', 'false');
+                            markDirty();
+                        } else {
+                            // 恢复原值
+                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${currentText}</span>`;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    }
+                    
+                    input.addEventListener('blur', saveEdit);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            saveEdit();
+                        } else if (e.key === 'Escape') {
+                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${currentText}</span>`;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    });
+                } else {
+                    // 描述编辑
+                    const input = document.createElement('textarea');
+                    input.value = currentText;
+                    input.className = 'title-edit-input';
+                    input.style.width = '100%';
+                    input.style.border = '1px solid #1890ff';
+                    input.style.borderRadius = '4px';
+                    input.style.padding = '4px 8px';
+                    input.style.fontSize = '14px';
+                    input.style.color = '#595959';
+                    input.style.backgroundColor = '#fff';
+                    input.style.resize = 'vertical';
+                    input.style.minHeight = '60px';
+                    input.style.fontFamily = 'inherit';
+                    
+                    element.setAttribute('data-editing', 'true');
+                    element.innerHTML = '';
+                    element.appendChild(input);
+                    input.focus();
+                    
+                    function saveEdit() {
+                        const newValue = input.value.trim();
+                        if (newValue) {
+                            element.textContent = newValue;
+                            element.setAttribute('data-editing', 'false');
+                            markDirty();
+                        } else {
+                            // 恢复原值
+                            element.textContent = currentText;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    }
+                    
+                    input.addEventListener('blur', saveEdit);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' && e.shiftKey) {
+                            // Shift+Enter 换行
+                            return;
+                        } else if (e.key === 'Enter') {
+                            e.preventDefault();
+                            saveEdit();
+                        } else if (e.key === 'Escape') {
+                            element.textContent = currentText;
+                            element.setAttribute('data-editing', 'false');
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 初始化表头编辑功能
+        makeEditable(document.getElementById('tableTitle'), 'name');
+        makeEditable(document.getElementById('tableName'), 'tableName');
+        makeEditable(document.getElementById('tableDesc'), 'desc');
+        
+        // 字段库抽屉逻辑与插入
+        const drawer = document.getElementById('fieldLibDrawer');
+        const fieldLibList = document.getElementById('fieldLibList');
+        const fieldLibData = [
+            { key: 'id', name_zh: '主键ID', type: 'BIGINT', desc: '主键ID，自增' },
+            { key: 'user_id', name_zh: '用户ID', type: 'BIGINT', desc: '用户唯一标识' },
+            { key: 'name', name_zh: '姓名', type: 'VARCHAR(100)', desc: '姓名' },
+            { key: 'email', name_zh: '邮箱', type: 'VARCHAR(255)', desc: '邮箱地址' },
+            { key: 'created_at', name_zh: '创建时间', type: 'TIMESTAMP', desc: '创建时间' },
+            { key: 'updated_at', name_zh: '更新时间', type: 'TIMESTAMP', desc: '更新时间' }
+        ];
+        function renderFieldLib(list) {
+            fieldLibList.innerHTML = list.map(f => `
+                <label style="display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid #f5f5f5;">
+                    <input type="checkbox" class="field-lib-check" data-key="${f.key}" />
+                    <div style="flex:1;">
+                        <div style="font-weight:600;color:#262626;">${f.key} <span style="color:#8c8c8c;font-weight:400;">(${f.name_zh})</span></div>
+                        <div style="color:#8c8c8c;font-size:12px;">${f.type}｜${f.desc}</div>
+                    </div>
+                    <button class="toolbar-btn" data-insert-one="${f.key}">插入</button>
+                </label>
+            `).join('');
+        }
+        renderFieldLib(fieldLibData);
+        document.getElementById('openFieldLibBtn').onclick = () => { drawer.style.display = 'flex'; };
+        document.getElementById('closeFieldLib').onclick = () => { drawer.style.display = 'none'; };
+        
+        // 列可见性控制
+        const columnVisibilityDrawer = document.getElementById('columnVisibilityDrawer');
+        document.getElementById('columnVisibilityBtn').onclick = () => { columnVisibilityDrawer.style.display = 'flex'; };
+        document.getElementById('closeColumnVisibility').onclick = () => { columnVisibilityDrawer.style.display = 'none'; };
+        
+        // 快速导入功能
+        const quickImportDrawer = document.getElementById('quickImportDrawer');
+        document.getElementById('quickImportBtn').onclick = () => { quickImportDrawer.style.display = 'flex'; };
+        document.getElementById('closeQuickImport').onclick = () => { quickImportDrawer.style.display = 'none'; };
+        
+        // 标签页切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.getAttribute('data-tab');
+                
+                // 更新标签页按钮状态
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // 更新标签页内容
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById(tabName + 'Tab').classList.add('active');
+                
+                // 加载对应数据
+                if (tabName === 'database') {
+                    loadDatabaseTables();
+                } else if (tabName === 'models') {
+                    loadExistingModels();
+                }
+            });
+        });
+        
+        // 模拟数据库表数据
+        const dbTableData = [
+            { name: 'user_info', type: 'MySQL', desc: '用户基本信息表', fields: [
+                { name: 'id', type: 'BIGINT', desc: '主键ID' },
+                { name: 'username', type: 'VARCHAR(50)', desc: '用户名' },
+                { name: 'email', type: 'VARCHAR(100)', desc: '邮箱' }
+            ]},
+            { name: 'order_master', type: 'MySQL', desc: '订单主表', fields: [
+                { name: 'order_id', type: 'VARCHAR(32)', desc: '订单ID' },
+                { name: 'user_id', type: 'BIGINT', desc: '用户ID' },
+                { name: 'amount', type: 'DECIMAL(10,2)', desc: '订单金额' }
+            ]}
+        ];
+        
+        // 模拟已有模型数据
+        const modelData = [
+            { name: 'dwd_user_profile', type: 'DWD', desc: '用户档案宽表', fields: [
+                { name: 'user_id', type: 'BIGINT', desc: '用户ID' },
+                { name: 'user_name', type: 'VARCHAR(100)', desc: '用户姓名' },
+                { name: 'user_level', type: 'VARCHAR(20)', desc: '用户等级' }
+            ]},
+            { name: 'dws_user_summary', type: 'DWS', desc: '用户汇总表', fields: [
+                { name: 'user_id', type: 'BIGINT', desc: '用户ID' },
+                { name: 'total_orders', type: 'INT', desc: '总订单数' },
+                { name: 'total_amount', type: 'DECIMAL(12,2)', desc: '总消费金额' }
+            ]}
+        ];
+        
+        // 加载数据库表
+        function loadDatabaseTables() {
+            const list = document.getElementById('dbTableList');
+            list.innerHTML = dbTableData.map(table => `
+                <div class="import-item" data-type="database" data-table="${table.name}">
+                    <div class="import-item-header">
+                        <span class="import-item-name">${table.name}</span>
+                        <span class="import-item-type">${table.type}</span>
+                    </div>
+                    <div class="import-item-desc">${table.desc}</div>
+                </div>
+            `).join('');
+            
+            // 添加点击事件
+            list.querySelectorAll('.import-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    list.querySelectorAll('.import-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+            });
+        }
+        
+        // 加载已有模型
+        function loadExistingModels() {
+            const list = document.getElementById('modelList');
+            list.innerHTML = modelData.map(model => `
+                <div class="import-item" data-type="model" data-model="${model.name}">
+                    <div class="import-item-header">
+                        <span class="import-item-name">${model.name}</span>
+                        <span class="import-item-type">${model.type}</span>
+                    </div>
+                    <div class="import-item-desc">${model.desc}</div>
+                </div>
+            `).join('');
+            
+            // 添加点击事件
+            list.querySelectorAll('.import-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    list.querySelectorAll('.import-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+            });
+        }
+        
+        // 导入选中字段
+        document.getElementById('importSelectedFields').onclick = () => {
+            const selectedItem = document.querySelector('.import-item.selected');
+            if (!selectedItem) {
+                alert('请先选择要导入的表或模型');
+                return;
+            }
+            
+            const type = selectedItem.getAttribute('data-type');
+            const name = selectedItem.getAttribute('data-' + type);
+            
+            if (type === 'database') {
+                const table = dbTableData.find(t => t.name === name);
+                if (table) {
+                    table.fields.forEach(field => {
+                        insertField({
+                            key: field.name,
+                            name_zh: field.name,
+                            type: field.type,
+                            desc: field.desc
+                        });
+                    });
+                }
+            } else if (type === 'model') {
+                const model = modelData.find(m => m.name === name);
+                if (model) {
+                    model.fields.forEach(field => {
+                        insertField({
+                            key: field.name,
+                            name_zh: field.name,
+                            type: field.type,
+                            desc: field.desc
+                        });
+                    });
+                }
+            }
+            
+            quickImportDrawer.style.display = 'none';
+        };
+        
+        // 应用列可见性设置
+        document.getElementById('applyColumnVisibility').onclick = () => {
+            const checkboxes = document.querySelectorAll('.column-item input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                const columnName = checkbox.getAttribute('data-column');
+                const isVisible = checkbox.checked;
+                
+                // 隐藏/显示对应的列
+                const columnIndex = getColumnIndex(columnName);
+                if (columnIndex !== -1) {
+                    toggleColumnVisibility(columnIndex, isVisible);
+                }
+            });
+            columnVisibilityDrawer.style.display = 'none';
+        };
+        
+        // 获取列索引
+        function getColumnIndex(columnName) {
+            const columnMap = {
+                'name_en': 0,
+                'name_zh': 1,
+                'configured': 2,
+                'type': 3,
+                'length': 4,
+                'nullable': 5,
+                'default': 6,
+                'is_pk': 7,
+                'description': 8,
+                'source_system': 9,
+                'source_database': 10,
+                'source_table': 11,
+                'source_field': 12,
+                'source_field_type': 13,
+                'calculation': 14,
+                'actions': 15
+            };
+            return columnMap[columnName] || -1;
+        }
+        
+        // 切换列可见性
+        function toggleColumnVisibility(columnIndex, isVisible) {
+            const headerCells = document.querySelectorAll('.table-header-cell');
+            const dataRows = document.querySelectorAll('.table-row');
+            
+            if (headerCells[columnIndex]) {
+                headerCells[columnIndex].style.display = isVisible ? 'block' : 'none';
+            }
+            
+            dataRows.forEach(row => {
+                const cells = row.querySelectorAll('.table-cell');
+                if (cells[columnIndex]) {
+                    cells[columnIndex].style.display = isVisible ? 'block' : 'none';
+                }
+            });
+        }
+        
+        document.getElementById('fieldSearch').addEventListener('input', (e) => {
+            const kw = e.target.value.trim().toLowerCase();
+            const filtered = fieldLibData.filter(f => f.key.includes(kw) || f.name_zh.includes(kw) || f.desc.includes(kw));
+            renderFieldLib(filtered);
+        });
+        function insertField(field) {
+            const tableContainer = document.querySelector('.table-container');
+            const row = document.createElement('div');
+            row.className = 'table-row';
+            row.dataset.fieldId = Date.now();
+            const baseType = field.type.replace(/\(.*/, '');
+            const len = (field.type.match(/\((.*)\)/) || [,''])[1];
+            row.innerHTML = `
+                <div class="table-cell"><input type="text" class="cell-input" value="${field.key}" data-field="name_en"></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="${field.name_zh}" data-field="name_zh"></div>
+                <div class="table-cell"><input type="checkbox"></div>
+                <div class="table-cell"><span class="cell-input" data-field="type">${baseType || 'VARCHAR'}</span></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="${len}" data-field="length" placeholder="长度"></div>
+                <div class="table-cell"><select class="cell-input" data-field="nullable"><option value="NOT NULL">NOT NULL</option><option value="NULL" selected>NULL</option></select></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="default" placeholder="默认值"></div>
+                <div class="table-cell"><select class="cell-input" data-field="is_pk"><option>是</option><option selected>否</option></select></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="${field.desc}" data-field="description" placeholder="字段描述"></div>
+                <div class="table-cell">
+                    <select class="cell-input">
+                        <option>CRM</option>
+                        <option>生产环境PostgreSQL</option>
+                        <option>测试环境MySQL</option>
+                    </select>
+                </div>
+                <div class="table-cell">
+                    <select class="cell-input">
+                        <option>db1</option>
+                        <option>warehouse</option>
+                    </select>
+                </div>
+                <div class="table-cell">
+                    <select class="cell-input">
+                        <option>public</option>
+                        <option>ods</option>
+                        <option>dwd</option>
+                    </select>
+                </div>
+                <div class="table-cell">
+                    <select class="cell-input">
+                        <option>t_user</option>
+                        <option>user_profile</option>
+                    </select>
+                </div>
+                <div class="table-cell">
+                    <select class="cell-input">
+                        <option>id</option>
+                        <option>name</option>
+                        <option>email</option>
+                    </select>
+                </div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" placeholder="DWS/ADS 填写聚合或表达式"></div>
+                <div class="table-cell"><div class="field-actions"><button class="field-action-btn danger">删除</button></div></div>
+            `;
+            tableContainer.insertBefore(row, document.getElementById('addFieldBtn'));
+            markDirty();
+            addRowEventListeners(row); // 为新添加的行添加事件监听器
+        }
+        document.addEventListener('click', (e) => {
+            const insertOne = e.target.getAttribute('data-insert-one');
+            if (insertOne) {
+                const field = fieldLibData.find(f => f.key === insertOne);
+                if (field) insertField(field);
+            }
+        });
+        document.getElementById('insertSelectedFields').onclick = () => {
+            document.querySelectorAll('.field-lib-check:checked').forEach(chk => {
+                const field = fieldLibData.find(f => f.key === chk.getAttribute('data-key'));
+                if (field) insertField(field);
+            });
+            drawer.style.display = 'none';
+        };
+        // 自动保存指示（原型）
+        let saveTimer;
+        function markDirty() {
+            const status = document.getElementById('autosaveStatus');
+            status.innerHTML = '<div class="status-dot"></div> 正在自动保存...';
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const ts = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${hh}:${mm}`;
+                document.getElementById('autosaveHint').textContent = `已自动保存 ${ts}`;
+                status.innerHTML = '<div class="status-dot"></div> 已自动保存';
+            }, 1200);
+        }
+
+        // 监听输入变更以触发自动保存
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('cell-input') || e.target.classList.contains('property-input') || e.target.classList.contains('table-name-input')) {
+                markDirty();
+            }
+        });
+
         // 拖拽功能
         document.querySelectorAll('.field-item').forEach(item => {
             item.addEventListener('dragstart', (e) => {
@@ -791,7 +1664,10 @@
         // 表格行点击编辑
         document.querySelectorAll('.table-row').forEach(row => {
             row.addEventListener('click', () => {
-                row.style.background = '#f0f8ff';
+                // 移除其他行的选中状态
+                document.querySelectorAll('.table-row').forEach(r => r.classList.remove('selected'));
+                // 添加当前行的选中状态
+                row.classList.add('selected');
             });
         });
         
@@ -799,38 +1675,125 @@
         document.querySelectorAll('.cell-input').forEach(input => {
             input.addEventListener('focus', () => {
                 input.parentElement.style.background = '#f0f8ff';
+                input.parentElement.classList.add('focused');
             });
             
             input.addEventListener('blur', () => {
                 input.parentElement.style.background = '';
-            });
-        });
-
-        // 字段类型选择器
-        document.querySelectorAll('.field-type-selector').forEach(selector => {
-            const dropdown = selector.querySelector('.field-type-dropdown');
-            const typeSpan = selector.querySelector('[data-field="type"]');
-            
-            typeSpan.addEventListener('click', () => {
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-            });
-            
-            selector.querySelectorAll('.field-type-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    typeSpan.textContent = option.dataset.type;
-                    dropdown.style.display = 'none';
-                });
+                input.parentElement.classList.remove('focused');
             });
         });
         
-        // 点击外部关闭下拉框
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.field-type-selector')) {
-                document.querySelectorAll('.field-type-dropdown').forEach(dropdown => {
-                    dropdown.style.display = 'none';
+        // 动态添加事件监听器（用于新添加的行）
+        function addRowEventListeners(row) {
+            // 行选择
+            row.addEventListener('click', () => {
+                document.querySelectorAll('.table-row').forEach(r => r.classList.remove('selected'));
+                row.classList.add('selected');
+            });
+            
+            // 输入框聚焦效果
+            row.querySelectorAll('.cell-input').forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.style.background = '#f0f8ff';
+                    input.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', () => {
+                    input.parentElement.style.background = '';
+                    input.parentElement.classList.remove('focused');
+                });
+            });
+            
+            // 删除按钮事件
+            const deleteBtn = row.querySelector('.field-action-btn.danger');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('确定要删除这个字段吗？')) {
+                        row.remove();
+                        markDirty();
+                    }
                 });
             }
+        }
+        
+        // 为现有行添加事件监听器
+        document.querySelectorAll('.table-row').forEach(addRowEventListeners);
+
+        // 字段类型选择器（简化：点击类型文本时在几种常用类型间切换）
+        document.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-field="type"]');
+            if (!el) return;
+            const types = ['BIGINT', 'INT', 'VARCHAR', 'TIMESTAMP', 'DECIMAL', 'DATE', 'DATETIME'];
+            const cur = el.textContent.trim();
+            const idx = types.indexOf(cur);
+            const next = types[(idx + 1) % types.length];
+            el.textContent = next;
+            markDirty();
         });
+        
+        // 字段类型选择器下拉菜单
+        document.addEventListener('click', (e) => {
+            const typeCell = e.target.closest('[data-field="type"]');
+            if (!typeCell) return;
+            
+            // 创建下拉菜单
+            const dropdown = document.createElement('div');
+            dropdown.className = 'field-type-dropdown';
+            dropdown.style.position = 'absolute';
+            dropdown.style.top = '100%';
+            dropdown.style.left = '0';
+            dropdown.style.background = '#fff';
+            dropdown.style.border = '1px solid #d9d9d9';
+            dropdown.style.borderRadius = '6px';
+            dropdown.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            dropdown.style.zIndex = '1000';
+            dropdown.style.minWidth = '200px';
+            dropdown.style.maxHeight = '300px';
+            dropdown.style.overflowY = 'auto';
+            
+            const types = [
+                { category: '整数类型', items: ['TINYINT', 'SMALLINT', 'INT', 'BIGINT'] },
+                { category: '浮点类型', items: ['FLOAT', 'DOUBLE', 'DECIMAL'] },
+                { category: '字符串类型', items: ['CHAR', 'VARCHAR', 'TEXT', 'LONGTEXT'] },
+                { category: '时间类型', items: ['DATE', 'TIME', 'DATETIME', 'TIMESTAMP'] },
+                { category: '其他类型', items: ['BOOLEAN', 'JSON', 'BLOB'] }
+            ];
+            
+            dropdown.innerHTML = types.map(type => `
+                <div class="field-type-category">${type.category}</div>
+                ${type.items.map(item => `
+                    <div class="field-type-option" data-type="${item}">${item}</div>
+                `).join('')}
+            `).join('');
+            
+            // 显示下拉菜单
+            typeCell.style.position = 'relative';
+            typeCell.appendChild(dropdown);
+            
+            // 点击选项时更新类型
+            dropdown.addEventListener('click', (e) => {
+                if (e.target.classList.contains('field-type-option')) {
+                    const newType = e.target.getAttribute('data-type');
+                    typeCell.textContent = newType;
+                    typeCell.removeChild(dropdown);
+                    markDirty();
+                }
+            });
+            
+            // 点击其他地方时关闭下拉菜单
+            setTimeout(() => {
+                document.addEventListener('click', function closeDropdown() {
+                    if (typeCell.contains(dropdown)) {
+                        typeCell.removeChild(dropdown);
+                    }
+                    document.removeEventListener('click', closeDropdown);
+                });
+            }, 0);
+        });
+        
+        // 下拉已移除，不再需要关闭逻辑
         
         // 添加字段
         document.getElementById('addFieldBtn').addEventListener('click', () => {
@@ -839,55 +1802,58 @@
             newRow.className = 'table-row';
             newRow.dataset.fieldId = Date.now();
             newRow.innerHTML = `
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="name_en" placeholder="字段英文"></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="name_zh" placeholder="字段中文"></div>
+                <div class="table-cell"><input type="checkbox"></div>
+                <div class="table-cell"><span class="cell-input" data-field="type">VARCHAR</span></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="length" placeholder="长度"></div>
+                <div class="table-cell"><select class="cell-input" data-field="nullable"><option value="NOT NULL">NOT NULL</option><option value="NULL" selected>NULL</option></select></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="default" placeholder="默认值"></div>
+                <div class="table-cell"><select class="cell-input" data-field="is_pk"><option>是</option><option selected>否</option></select></div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" data-field="description" placeholder="字段描述"></div>
                 <div class="table-cell">
-                    <input type="text" class="cell-input" value="" data-field="name" placeholder="字段名">
-                </div>
-                <div class="table-cell">
-                    <div class="field-type-selector">
-                        <span class="cell-input" data-field="type">VARCHAR</span>
-                    </div>
-                </div>
-                <div class="table-cell">
-                    <input type="text" class="cell-input" value="" data-field="length" placeholder="长度">
-                </div>
-                <div class="table-cell">
-                    <select class="cell-input" data-field="nullable">
-                        <option value="NOT NULL">NOT NULL</option>
-                        <option value="NULL" selected>NULL</option>
+                    <select class="cell-input">
+                        <option>CRM</option>
+                        <option>生产环境PostgreSQL</option>
+                        <option>测试环境MySQL</option>
                     </select>
                 </div>
                 <div class="table-cell">
-                    <input type="text" class="cell-input" value="" data-field="default" placeholder="默认值">
+                    <select class="cell-input">
+                        <option>db1</option>
+                        <option>warehouse</option>
+                    </select>
                 </div>
                 <div class="table-cell">
-                    <input type="text" class="cell-input" value="" data-field="comment" placeholder="注释">
+                    <select class="cell-input">
+                        <option>public</option>
+                        <option>ods</option>
+                        <option>dwd</option>
+                    </select>
                 </div>
                 <div class="table-cell">
-                    <div class="field-constraints">
-                        <span class="constraint-tag">PK</span>
-                        <span class="constraint-tag">UQ</span>
-                        <span class="constraint-tag">IDX</span>
-                    </div>
+                    <select class="cell-input">
+                        <option>t_user</option>
+                        <option>user_profile</option>
+                    </select>
                 </div>
                 <div class="table-cell">
-                    <div class="field-actions">
-                        <button class="field-action-btn">编辑</button>
-                        <button class="field-action-btn danger">删除</button>
-                    </div>
+                    <select class="cell-input">
+                        <option>id</option>
+                        <option>name</option>
+                        <option>email</option>
+                    </select>
                 </div>
+                <div class="table-cell"><input type="text" class="cell-input" value="" placeholder="DWS/ADS 填写聚合或表达式"></div>
+                <div class="table-cell"><div class="field-actions"><button class="field-action-btn danger">删除</button></div></div>
             `;
             
             tableContainer.insertBefore(newRow, document.getElementById('addFieldBtn'));
+            markDirty();
+            addRowEventListeners(newRow); // 为新添加的行添加事件监听器
         });
         
-        // 删除字段
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('danger')) {
-                if (confirm('确定要删除这个字段吗？')) {
-                    e.target.closest('.table-row').remove();
-                }
-            }
-        });
+        // 删除字段功能已集成到addRowEventListeners函数中
         
         // 约束标签切换
         document.addEventListener('click', (e) => {
@@ -896,22 +1862,55 @@
             }
         });
         
-        // 保存按钮
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            alert('模型已保存！');
+        // 已移除保存/撤销/重做逻辑，改为自动保存
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S 保存
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                markDirty();
+                // 显示保存成功提示
+                const status = document.getElementById('autosaveStatus');
+                status.innerHTML = '<div class="status-dot"></div> 手动保存成功';
+                setTimeout(() => {
+                    status.innerHTML = '<div class="status-dot"></div> 已自动保存';
+                }, 2000);
+            }
+            
+            // Delete 删除选中的行
+            if (e.key === 'Delete') {
+                const selectedRow = document.querySelector('.table-row.selected');
+                if (selectedRow) {
+                    if (confirm('确定要删除这个字段吗？')) {
+                        selectedRow.remove();
+                        markDirty();
+                    }
+                }
+            }
+            
+            // Enter 在输入框中换行或确认
+            if (e.key === 'Enter' && !e.shiftKey) {
+                const focusedInput = document.activeElement;
+                if (focusedInput && focusedInput.classList.contains('cell-input')) {
+                    // 找到下一个输入框
+                    const currentCell = focusedInput.closest('.table-cell');
+                    const currentRow = currentCell.closest('.table-row');
+                    const nextCell = currentCell.nextElementSibling;
+                    
+                    if (nextCell && nextCell.querySelector('.cell-input')) {
+                        nextCell.querySelector('.cell-input').focus();
+                    } else {
+                        // 如果当前行没有下一个单元格，跳到下一行
+                        const nextRow = currentRow.nextElementSibling;
+                        if (nextRow && nextRow.classList.contains('table-row')) {
+                            const firstInput = nextRow.querySelector('.cell-input');
+                            if (firstInput) firstInput.focus();
+                        }
+                    }
+                }
+            }
         });
-        
-        // 撤销重做按钮状态管理
-        let undoStack = [];
-        let redoStack = [];
-        
-        function updateUndoRedoState() {
-            document.getElementById('undoBtn').disabled = undoStack.length === 0;
-            document.getElementById('redoBtn').disabled = redoStack.length === 0;
-            document.querySelector('.stack-indicator').textContent = `撤销: ${undoStack.length} | 重做: ${redoStack.length}`;
-        }
-        
-        updateUndoRedoState();
     </script>
 </body>
 </html>

@@ -520,18 +520,15 @@
         <div class="toolbar">
             <div class="search-box">
                 <input type="text" class="search-input" placeholder="搜索模型名称、描述或标签...">
-                <select class="filter-select">
-                    <option>全部类型</option>
-                    <option>表</option>
-                    <option>视图</option>
-                    <option>存储过程</option>
-                    <option>函数</option>
+                <select class="filter-select" id="dimensionSelect">
+                    <option value="domain" selected>按主题域</option>
+                    <option value="layer">按分层</option>
                 </select>
-                <select class="filter-select">
-                    <option>全部状态</option>
-                    <option>已发布</option>
-                    <option>草稿</option>
-                    <option>已归档</option>
+                <select class="filter-select" id="statusSelect">
+                    <option value="all" selected>全部状态</option>
+                    <option value="published">已发布</option>
+                    <option value="draft">草稿</option>
+                    <option value="archived">已归档</option>
                 </select>
             </div>
             
@@ -549,41 +546,10 @@
             <div class="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-title">模型分类</div>
-                    <div class="sidebar-subtitle">按业务域分类管理</div>
+                    <div class="sidebar-subtitle" id="sidebarSubtitle">按业务域分类管理</div>
                 </div>
                 
-                <div class="category-tree">
-                    <div class="category-item active">
-                        <span class="category-icon">👥</span>
-                        <span class="category-name">用户域</span>
-                        <span class="category-count">24</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-icon">🛒</span>
-                        <span class="category-name">订单域</span>
-                        <span class="category-count">18</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-icon">📦</span>
-                        <span class="category-name">商品域</span>
-                        <span class="category-count">15</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-icon">💰</span>
-                        <span class="category-name">财务域</span>
-                        <span class="category-count">12</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-icon">📊</span>
-                        <span class="category-name">分析域</span>
-                        <span class="category-name">32</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-icon">🔍</span>
-                        <span class="category-name">日志域</span>
-                        <span class="category-count">28</span>
-                    </div>
-                </div>
+                <div class="category-tree" id="categoryTree"></div>
             </div>
             
             <div class="main-content">
@@ -600,31 +566,22 @@
                     <table class="model-table">
                         <thead>
                             <tr>
-                                <th>模型名称</th>
-                                <th>类型</th>
-                                <th>描述</th>
-                                <th>统计信息</th>
+                                <th>英文表名</th>
+                                <th>中文名称</th>
+                                <th>分层</th>
+                                <th>主题域</th>
+                                <th>概述</th>
                                 <th>更新时间</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    <div class="model-name">user_profile</div>
-                                </td>
-                                <td>
-                                    <span class="model-type">表</span>
-                                </td>
-                                <td>
-                                    <div class="model-description">用户档案信息表，存储用户基本信息和档案数据</div>
-                                </td>
-                                <td>
-                                    <div class="model-stats">
-                                        <span class="model-stat">8字段</span>
-                                        <span class="model-stat">1.2M行</span>
-                                    </div>
-                                </td>
+                                <td><div class="model-name">dwd_user_profile</div></td>
+                                <td>用户档案表</td>
+                                <td><span class="model-type">DWD</span></td>
+                                <td>用户域</td>
+                                <td><div class="model-description">存储用户基本信息和档案数据</div></td>
                                 <td>2024-01-15 14:30</td>
                                 <td>
                                     <div class="model-actions">
@@ -636,21 +593,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
-                                    <div class="model-name">user_order_summary</div>
-                                </td>
-                                <td>
-                                    <span class="model-type">视图</span>
-                                </td>
-                                <td>
-                                    <div class="model-description">用户订单汇总视图，统计用户订单相关指标</div>
-                                </td>
-                                <td>
-                                    <div class="model-stats">
-                                        <span class="model-stat">5字段</span>
-                                        <span class="model-stat">动态</span>
-                                    </div>
-                                </td>
+                                <td><div class="model-name">ads_user_order_summary</div></td>
+                                <td>用户订单汇总</td>
+                                <td><span class="model-type">ADS</span></td>
+                                <td>订单域</td>
+                                <td><div class="model-description">统计用户订单相关指标</div></td>
                                 <td>2024-01-14 16:45</td>
                                 <td>
                                     <div class="model-actions">
@@ -662,21 +609,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
-                                    <div class="model-name">user_analysis</div>
-                                </td>
-                                <td>
-                                    <span class="model-type">表</span>
-                                </td>
-                                <td>
-                                    <div class="model-description">用户分析表，存储用户行为分析结果</div>
-                                </td>
-                                <td>
-                                    <div class="model-stats">
-                                        <span class="model-stat">15字段</span>
-                                        <span class="model-stat">856K行</span>
-                                    </div>
-                                </td>
+                                <td><div class="model-name">dws_user_analysis</div></td>
+                                <td>用户分析</td>
+                                <td><span class="model-type">DWS</span></td>
+                                <td>分析域</td>
+                                <td><div class="model-description">用户行为分析结果</div></td>
                                 <td>2024-01-13 09:20</td>
                                 <td>
                                     <div class="model-actions">
@@ -688,21 +625,11 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>
-                                    <div class="model-name">user_preference</div>
-                                </td>
-                                <td>
-                                    <span class="model-type">表</span>
-                                </td>
-                                <td>
-                                    <div class="model-description">用户偏好表，记录用户个性化设置和偏好</div>
-                                </td>
-                                <td>
-                                    <div class="model-stats">
-                                        <span class="model-stat">12字段</span>
-                                        <span class="model-stat">2.1M行</span>
-                                    </div>
-                                </td>
+                                <td><div class="model-name">dim_user_preference</div></td>
+                                <td>用户偏好维表</td>
+                                <td><span class="model-type">DIM</span></td>
+                                <td>用户域</td>
+                                <td><div class="model-description">用户个性化设置和偏好</div></td>
                                 <td>2024-01-12 11:15</td>
                                 <td>
                                     <div class="model-actions">
@@ -851,17 +778,53 @@
             }
         }
         
-        // 分类切换
-        document.querySelectorAll('.category-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                
-                // 更新内容标题
-                const categoryName = item.querySelector('.category-name').textContent;
-                const categoryCount = item.querySelector('.category-count').textContent;
-                document.querySelector('.content-title').textContent = `${categoryName}模型 (${categoryCount})`;
+        // 分类维度与分类数据
+        const domains = [
+            { icon: '👥', name: '用户域', count: 24 },
+            { icon: '🛒', name: '订单域', count: 18 },
+            { icon: '📦', name: '商品域', count: 15 },
+            { icon: '💰', name: '财务域', count: 12 },
+            { icon: '📊', name: '分析域', count: 32 },
+            { icon: '🔍', name: '日志域', count: 28 }
+        ];
+        const layers = [
+            { icon: '📥', name: 'ODS', count: 40 },
+            { icon: '🧱', name: 'DWD', count: 52 },
+            { icon: '📚', name: 'DIM', count: 38 },
+            { icon: '📈', name: 'DWS', count: 26 },
+            { icon: '🚀', name: 'ADS', count: 22 }
+        ];
+
+        const categoryTree = document.getElementById('categoryTree');
+        const sidebarSubtitle = document.getElementById('sidebarSubtitle');
+        const dimensionSelect = document.getElementById('dimensionSelect');
+
+        function renderCategories(dimension) {
+            const data = dimension === 'layer' ? layers : domains;
+            sidebarSubtitle.textContent = dimension === 'layer' ? '按分层分类管理' : '按业务域分类管理';
+            categoryTree.innerHTML = '';
+            data.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'category-item' + (idx === 0 ? ' active' : '');
+                div.innerHTML = `<span class="category-icon">${item.icon}</span>
+                                 <span class="category-name">${item.name}</span>
+                                 <span class="category-count">${item.count}</span>`;
+                div.addEventListener('click', () => {
+                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                    div.classList.add('active');
+                    const contentTitle = document.querySelector('.content-title');
+                    contentTitle.textContent = `${item.name}模型 (${item.count})`;
+                });
+                categoryTree.appendChild(div);
             });
+            const first = data[0];
+            document.querySelector('.content-title').textContent = `${first.name}模型 (${first.count})`;
+        }
+
+        // 初始化分类
+        renderCategories('domain');
+        dimensionSelect.addEventListener('change', (e) => {
+            renderCategories(e.target.value);
         });
         
         // 模型名点击
@@ -940,20 +903,17 @@
         });
 
         // 弹窗交互
-        function openModelModal(url, title) {
-            document.getElementById('modalMask').style.display = 'flex';
-            document.getElementById('modalIframe').src = url;
-            document.getElementById('modalTitle').textContent = title;
+        // 直接全屏打开模型设计页（不弹窗）
+        function openDesign() {
+            if (parent && parent.loadPage) {
+                parent.loadPage('online-modeling', '在线建模');
+            } else {
+                window.location.href = 'online-modeling.html';
+            }
         }
-        function closeModelModal() {
-            document.getElementById('modalMask').style.display = 'none';
-            document.getElementById('modalIframe').src = '';
-        }
-        document.getElementById('newModelBtn').onclick = function() {
-            openModelModal('online-modeling.html', '新建模型');
-        };
-        document.getElementById('importBtn').onclick = function() {
-            openModelModal('ddl-import.html', 'DDL导入');
+        document.getElementById('newModelBtn').onclick = openDesign;
+        document.getElementById('importBtn').onclick = function(){
+            if (parent && parent.loadPage) parent.loadPage('ddl-import', 'DDL导入'); else window.location.href = 'ddl-import.html';
         };
     </script>
 </body>

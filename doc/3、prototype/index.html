@@ -321,7 +321,7 @@
     <script>
         function loadPage(page, title) {
             document.getElementById('page-title').textContent = title;
-            const map = {
+                const map = {
                 'dashboard': '首页',
                 'online-modeling': '数据建模 / 在线建模',
                 'ddl-import': '数据建模 / DDL导入',
@@ -331,7 +331,7 @@
                 'data-governance': '数据治理',
                 'document-management': '文档管理',
                 'system-settings': '系统设置',
-                'security-settings': '安全设置'
+                    'security-settings': '安全设置'
             };
             document.getElementById('breadcrumb').textContent = `首页 / ${map[page] || title}`;
             document.getElementById('welcome-content').style.display = 'none';
