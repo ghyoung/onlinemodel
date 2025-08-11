@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血缘关系 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .lineage-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .toolbar-btn.active {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .search-box {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 300px;
+            margin-right: 16px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .depth-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 16px;
+        }
+        
+        .depth-label {
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        .depth-input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .node-item {
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .node-item:hover {
+            border-color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .node-item.selected {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .node-name {
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .node-type {
+            font-size: 12px;
+            color: #8c8c8c;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .node-details {
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        .lineage-canvas {
+            flex: 1;
+            background: #fafafa;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .lineage-node {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            background: #fff;
+            border: 2px solid #d9d9d9;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .lineage-node:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .lineage-node.selected {
+            border-color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .lineage-node.source {
+            border-color: #52c41a;
+            background: #f6ffed;
+        }
+        
+        .lineage-node.target {
+            border-color: #faad14;
+            background: #fffbe6;
+        }
+        
+        .node-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #262626;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        
+        .node-info {
+            font-size: 10px;
+            color: #8c8c8c;
+            text-align: center;
+        }
+        
+        .lineage-arrow {
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .arrow-path {
+            stroke: #8c8c8f;
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        
+        .arrow-path.highlighted {
+            stroke: #1890ff;
+            stroke-width: 3;
+        }
+        
+        .canvas-controls {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .control-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .zoom-info {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        
+        .path-info {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 300px;
+            display: none;
+        }
+        
+        .path-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .path-details {
+            font-size: 12px;
+            color: #595959;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="lineage-container">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <input type="text" class="search-box" placeholder="搜索表名或字段名...">
+                <div class="depth-control">
+                    <span class="depth-label">血缘深度:</span>
+                    <input type="number" class="depth-input" value="3" min="1" max="10">
+                </div>
+                <button class="toolbar-btn active">🔍 血缘分析</button>
+                <button class="toolbar-btn">🔄 影响分析</button>
+                <button class="toolbar-btn">📊 统计报告</button>
+            </div>
+            
+            <div class="toolbar-right">
+                <button class="toolbar-btn">📤 导出</button>
+                <button class="toolbar-btn">🖼️ 截图</button>
+                <button class="toolbar-btn">⚙️ 设置</button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">血缘节点</div>
+                    <div class="sidebar-subtitle">共 8 个节点</div>
+                </div>
+                
+                <div class="sidebar-content">
+                    <div class="node-item selected">
+                        <div class="node-header">
+                            <span class="node-name">user_profile</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">用户档案信息表 • 8个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">order_info</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">订单信息表 • 12个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">user_order_summary</span>
+                            <span class="node-type">视图</span>
+                        </div>
+                        <div class="node-details">用户订单汇总视图 • 5个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">user_analysis</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">用户分析表 • 15个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">report_daily</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">日报表 • 20个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">report_weekly</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">周报表 • 18个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">report_monthly</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">月报表 • 22个字段</div>
+                    </div>
+                    
+                    <div class="node-item">
+                        <div class="node-header">
+                            <span class="node-name">dashboard_data</span>
+                            <span class="node-type">表</span>
+                        </div>
+                        <div class="node-details">仪表板数据表 • 25个字段</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lineage-canvas">
+                <div class="canvas-container">
+                    <!-- 血缘节点 -->
+                    <div class="lineage-node source" style="top: 100px; left: 200px;">
+                        <div class="node-title">user_profile</div>
+                        <div class="node-info">表 • 8字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 100px; left: 400px;">
+                        <div class="node-title">order_info</div>
+                        <div class="node-info">表 • 12字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 100px; left: 600px;">
+                        <div class="node-title">product_info</div>
+                        <div class="node-info">表 • 15字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 250px; left: 300px;">
+                        <div class="node-title">user_order_summary</div>
+                        <div class="node-info">视图 • 5字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 250px; left: 500px;">
+                        <div class="node-title">order_product_summary</div>
+                        <div class="node-info">视图 • 6字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 400px; left: 200px;">
+                        <div class="node-title">user_analysis</div>
+                        <div class="node-info">表 • 15字段</div>
+                    </div>
+                    
+                    <div class="lineage-node" style="top: 400px; left: 400px;">
+                        <div class="node-title">report_daily</div>
+                        <div class="node-info">表 • 20字段</div>
+                    </div>
+                    
+                    <div class="lineage-node target" style="top: 400px; left: 600px;">
+                        <div class="node-title">dashboard_data</div>
+                        <div class="node-info">表 • 25字段</div>
+                    </div>
+                    
+                    <!-- 血缘箭头 -->
+                    <svg class="lineage-arrow" width="100%" height="100%" style="position: absolute; top: 0; left: 0;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                                    refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#8c8c8f" />
+                            </marker>
+                        </defs>
+                        
+                        <!-- 血缘关系线 -->
+                        <path d="M 260 130 L 380 130" class="arrow-path" />
+                        <path d="M 460 130 L 580 130" class="arrow-path" />
+                        <path d="M 260 130 L 350 250" class="arrow-path" />
+                        <path d="M 460 130 L 550 250" class="arrow-path" />
+                        <path d="M 350 250 L 260 400" class="arrow-path" />
+                        <path d="M 350 250 L 460 400" class="arrow-path" />
+                        <path d="M 550 250 L 460 400" class="arrow-path" />
+                        <path d="M 550 250 L 660 400" class="arrow-path" />
+                        <path d="M 260 400 L 460 400" class="arrow-path" />
+                        <path d="M 460 400 L 660 400" class="arrow-path" />
+                    </svg>
+                </div>
+                
+                <div class="canvas-controls">
+                    <button class="control-btn" title="放大">🔍+</button>
+                    <button class="control-btn" title="缩小">🔍-</button>
+                    <button class="control-btn" title="适应画布">📐</button>
+                    <button class="control-btn" title="重置视图">🔄</button>
+                </div>
+                
+                <div class="zoom-info">
+                    缩放: 100% | 拖拽移动 | 滚轮缩放
+                </div>
+                
+                <div class="path-info" id="pathInfo">
+                    <div class="path-title">血缘路径</div>
+                    <div class="path-details">
+                        从 user_profile 到 dashboard_data 的血缘路径：
+                        <br>user_profile → user_order_summary → user_analysis → dashboard_data
+                        <br><br>
+                        影响字段：用户ID、用户姓名、订单数量、消费金额等
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 节点选择
+        document.querySelectorAll('.node-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.node-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+            });
+        });
+        
+        // 血缘节点点击
+        document.querySelectorAll('.lineage-node').forEach(node => {
+            node.addEventListener('click', () => {
+                document.querySelectorAll('.lineage-node').forEach(n => n.classList.remove('selected'));
+                node.classList.add('selected');
+                
+                // 显示路径信息
+                const pathInfo = document.getElementById('pathInfo');
+                pathInfo.style.display = 'block';
+            });
+        });
+        
+        // 画布拖拽
+        let isDragging = false;
+        let startX, startY, startScrollX, startScrollY;
+        
+        const canvas = document.querySelector('.lineage-canvas');
+        
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('lineage-node')) return;
+            
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startScrollX = canvas.scrollLeft;
+            startScrollY = canvas.scrollTop;
+            canvas.style.cursor = 'grabbing';
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+            
+            canvas.scrollLeft = startScrollX - deltaX;
+            canvas.scrollTop = startScrollY - deltaY;
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.style.cursor = 'default';
+        });
+        
+        // 缩放控制
+        let currentZoom = 1;
+        
+        document.querySelector('.control-btn[title="放大"]').addEventListener('click', () => {
+            currentZoom = Math.min(currentZoom * 1.2, 3);
+            updateZoom();
+        });
+        
+        document.querySelector('.control-btn[title="缩小"]').addEventListener('click', () => {
+            currentZoom = Math.max(currentZoom / 1.2, 0.3);
+            updateZoom();
+        });
+        
+        function updateZoom() {
+            const container = document.querySelector('.canvas-container');
+            container.style.transform = `scale(${currentZoom})`;
+            container.style.transformOrigin = 'center center';
+            
+            document.querySelector('.zoom-info').textContent = `缩放: ${Math.round(currentZoom * 100)}% | 拖拽移动 | 滚轮缩放`;
+        }
+        
+        // 滚轮缩放
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            if (e.deltaY < 0) {
+                currentZoom = Math.min(currentZoom * 1.1, 3);
+            } else {
+                currentZoom = Math.max(currentZoom / 1.1, 0.3);
+            }
+            
+            updateZoom();
+        });
+    </script>
+</body>
+</html>

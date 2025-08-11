@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型管理 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .management-container {
+            width: 100vw;
+            max-width: none;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .toolbar {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .toolbar-btn.primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .toolbar-btn.primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-subtitle {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .category-tree {
+            padding: 16px;
+        }
+        
+        .category-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-item:hover {
+            background: #f0f8ff;
+            color: #1890ff;
+        }
+        
+        .category-item.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .category-icon {
+            font-size: 16px;
+        }
+        
+        .category-name {
+            flex: 1;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .main-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .content-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .view-btn {
+            padding: 8px 12px;
+            border: none;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .view-btn.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .model-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .model-table th {
+            background: #fafafa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .model-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        
+        .model-table tr:hover {
+            background: #fafafa;
+        }
+        
+        .model-name {
+            font-weight: 600;
+            color: #1890ff;
+            cursor: pointer;
+        }
+        
+        .model-name:hover {
+            text-decoration: underline;
+        }
+        
+        .model-type {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        .model-description {
+            color: #595959;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .model-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .model-stat {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .model-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .action-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .action-btn.danger:hover {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .model-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .model-card:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .model-card-header {
+            padding: 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .model-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .model-card-type {
+            display: inline-block;
+            background: #e6f7ff;
+            color: #1890ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .model-card-body {
+            padding: 16px;
+        }
+        
+        .model-card-description {
+            color: #595959;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+        
+        .model-card-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .model-card-stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .model-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .card-action-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .card-action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .card-action-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            border-top: 1px solid #e8e8e8;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595595;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .page-btn.active {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .modal-mask {
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            width: 90vw;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .modal-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            background: #fafafa;
+        }
+        .modal-close {
+            margin-left: auto;
+            font-size: 22px;
+            color: #8c8c8c;
+            cursor: pointer;
+        }
+        .modal-iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="management-container">
+        <div class="page-header">
+            <h1 class="page-title">模型管理</h1>
+            <p class="page-subtitle">管理已创建的模型和表结构，支持版本管理、导出等功能</p>
+        </div>
+        
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索模型名称、描述或标签...">
+                <select class="filter-select">
+                    <option>全部类型</option>
+                    <option>表</option>
+                    <option>视图</option>
+                    <option>存储过程</option>
+                    <option>函数</option>
+                </select>
+                <select class="filter-select">
+                    <option>全部状态</option>
+                    <option>已发布</option>
+                    <option>草稿</option>
+                    <option>已归档</option>
+                </select>
+            </div>
+            
+            <div class="toolbar-actions">
+                <button class="toolbar-btn" id="importBtn">
+                    📥 导入
+                </button>
+                <button class="toolbar-btn primary" id="newModelBtn">
+                    ✏️ 新建模型
+                </button>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">模型分类</div>
+                    <div class="sidebar-subtitle">按业务域分类管理</div>
+                </div>
+                
+                <div class="category-tree">
+                    <div class="category-item active">
+                        <span class="category-icon">👥</span>
+                        <span class="category-name">用户域</span>
+                        <span class="category-count">24</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">🛒</span>
+                        <span class="category-name">订单域</span>
+                        <span class="category-count">18</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">📦</span>
+                        <span class="category-name">商品域</span>
+                        <span class="category-count">15</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">💰</span>
+                        <span class="category-name">财务域</span>
+                        <span class="category-count">12</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">📊</span>
+                        <span class="category-name">分析域</span>
+                        <span class="category-name">32</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">🔍</span>
+                        <span class="category-name">日志域</span>
+                        <span class="category-count">28</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="content-title">用户域模型 (24)</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="switchView('table')">📋 表格视图</button>
+                        <button class="view-btn" onclick="switchView('grid')">🎴 卡片视图</button>
+                    </div>
+                </div>
+                
+                <!-- 表格视图 -->
+                <div id="tableView" class="table-view">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th>模型名称</th>
+                                <th>类型</th>
+                                <th>描述</th>
+                                <th>统计信息</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="model-name">user_profile</div>
+                                </td>
+                                <td>
+                                    <span class="model-type">表</span>
+                                </td>
+                                <td>
+                                    <div class="model-description">用户档案信息表，存储用户基本信息和档案数据</div>
+                                </td>
+                                <td>
+                                    <div class="model-stats">
+                                        <span class="model-stat">8字段</span>
+                                        <span class="model-stat">1.2M行</span>
+                                    </div>
+                                </td>
+                                <td>2024-01-15 14:30</td>
+                                <td>
+                                    <div class="model-actions">
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">查看</button>
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">编辑</button>
+                                        <button class="action-btn primary">导出</button>
+                                        <button class="action-btn danger">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="model-name">user_order_summary</div>
+                                </td>
+                                <td>
+                                    <span class="model-type">视图</span>
+                                </td>
+                                <td>
+                                    <div class="model-description">用户订单汇总视图，统计用户订单相关指标</div>
+                                </td>
+                                <td>
+                                    <div class="model-stats">
+                                        <span class="model-stat">5字段</span>
+                                        <span class="model-stat">动态</span>
+                                    </div>
+                                </td>
+                                <td>2024-01-14 16:45</td>
+                                <td>
+                                    <div class="model-actions">
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">查看</button>
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">编辑</button>
+                                        <button class="action-btn primary">导出</button>
+                                        <button class="action-btn danger">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="model-name">user_analysis</div>
+                                </td>
+                                <td>
+                                    <span class="model-type">表</span>
+                                </td>
+                                <td>
+                                    <div class="model-description">用户分析表，存储用户行为分析结果</div>
+                                </td>
+                                <td>
+                                    <div class="model-stats">
+                                        <span class="model-stat">15字段</span>
+                                        <span class="model-stat">856K行</span>
+                                    </div>
+                                </td>
+                                <td>2024-01-13 09:20</td>
+                                <td>
+                                    <div class="model-actions">
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">查看</button>
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">编辑</button>
+                                        <button class="action-btn primary">导出</button>
+                                        <button class="action-btn danger">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="model-name">user_preference</div>
+                                </td>
+                                <td>
+                                    <span class="model-type">表</span>
+                                </td>
+                                <td>
+                                    <div class="model-description">用户偏好表，记录用户个性化设置和偏好</div>
+                                </td>
+                                <td>
+                                    <div class="model-stats">
+                                        <span class="model-stat">12字段</span>
+                                        <span class="model-stat">2.1M行</span>
+                                    </div>
+                                </td>
+                                <td>2024-01-12 11:15</td>
+                                <td>
+                                    <div class="model-actions">
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">查看</button>
+                                        <button class="action-btn" onclick="openModelModal('online-modeling.html', '查看/编辑模型')">编辑</button>
+                                        <button class="action-btn primary">导出</button>
+                                        <button class="action-btn danger">删除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <button class="page-btn" disabled>上一页</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">下一页</button>
+                    </div>
+                </div>
+                
+                <!-- 卡片视图 -->
+                <div id="gridView" class="model-grid" style="display: none;">
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-card-title">user_profile</div>
+                            <span class="model-card-type">表</span>
+                        </div>
+                        <div class="model-card-body">
+                            <div class="model-card-description">
+                                用户档案信息表，存储用户基本信息和档案数据
+                            </div>
+                            <div class="model-card-stats">
+                                <div class="model-card-stat">
+                                    <div class="stat-number">8</div>
+                                    <div class="stat-label">字段</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">1.2M</div>
+                                    <div class="stat-label">行数</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">15</div>
+                                    <div class="stat-label">版本</div>
+                                </div>
+                            </div>
+                            <div class="model-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn primary">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-card-title">user_order_summary</div>
+                            <span class="model-card-type">视图</span>
+                        </div>
+                        <div class="model-card-body">
+                            <div class="model-card-description">
+                                用户订单汇总视图，统计用户订单相关指标
+                            </div>
+                            <div class="model-card-stats">
+                                <div class="model-card-stat">
+                                    <div class="stat-number">5</div>
+                                    <div class="stat-label">字段</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">动态</div>
+                                    <div class="stat-label">行数</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">8</div>
+                                    <div class="stat-label">版本</div>
+                                </div>
+                            </div>
+                            <div class="model-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn primary">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-card-title">user_analysis</div>
+                            <span class="model-card-type">表</span>
+                        </div>
+                        <div class="model-card-body">
+                            <div class="model-card-description">
+                                用户分析表，存储用户行为分析结果
+                            </div>
+                            <div class="model-card-stats">
+                                <div class="model-card-stat">
+                                    <div class="stat-number">15</div>
+                                    <div class="stat-label">字段</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">856K</div>
+                                    <div class="stat-label">行数</div>
+                                </div>
+                                <div class="model-card-stat">
+                                    <div class="stat-number">12</div>
+                                    <div class="stat-label">版本</div>
+                                </div>
+                            </div>
+                            <div class="model-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn primary">导出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modalMask" class="modal-mask" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">弹窗标题</div>
+            <span class="modal-close" onclick="closeModelModal()">×</span>
+            <iframe class="modal-iframe" id="modalIframe"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        // 视图切换
+        function switchView(view) {
+            const tableView = document.getElementById('tableView');
+            const gridView = document.getElementById('gridView');
+            const viewBtns = document.querySelectorAll('.view-btn');
+            
+            viewBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (view === 'table') {
+                tableView.style.display = 'block';
+                gridView.style.display = 'none';
+            } else {
+                tableView.style.display = 'none';
+                gridView.style.display = 'grid';
+            }
+        }
+        
+        // 分类切换
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                // 更新内容标题
+                const categoryName = item.querySelector('.category-name').textContent;
+                const categoryCount = item.querySelector('.category-count').textContent;
+                document.querySelector('.content-title').textContent = `${categoryName}模型 (${categoryCount})`;
+            });
+        });
+        
+        // 模型名点击
+        document.querySelectorAll('.model-name').forEach(name => {
+            name.addEventListener('click', () => {
+                // 跳转到在线建模页面
+                if (parent && parent.loadPage) {
+                    parent.loadPage('online-modeling', '在线建模');
+                }
+            });
+        });
+        
+        // 操作按钮
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const modelName = btn.closest('tr').querySelector('.model-name').textContent;
+                
+                if (action === '查看') {
+                    // 跳转到在线建模页面
+                    if (parent && parent.loadPage) {
+                        parent.loadPage('online-modeling', '在线建模');
+                    }
+                } else if (action === '编辑') {
+                    console.log('编辑模型:', modelName);
+                } else if (action === '导出') {
+                    console.log('导出模型:', modelName);
+                } else if (action === '删除') {
+                    if (confirm(`确定要删除模型 "${modelName}" 吗？`)) {
+                        console.log('删除模型:', modelName);
+                    }
+                }
+            });
+        });
+        
+        // 卡片操作按钮
+        document.querySelectorAll('.card-action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const modelName = btn.closest('.model-card').querySelector('.model-card-title').textContent;
+                
+                if (action === '查看') {
+                    // 跳转到在线建模页面
+                    if (parent && parent.loadPage) {
+                        parent.loadPage('online-modeling', '在线建模');
+                    }
+                } else if (action === '编辑') {
+                    console.log('编辑模型:', modelName);
+                } else if (action === '导出') {
+                    console.log('导出模型:', modelName);
+                }
+            });
+        });
+        
+        // 搜索功能
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.model-table tbody tr');
+            
+            rows.forEach(row => {
+                const modelName = row.querySelector('.model-name').textContent.toLowerCase();
+                const description = row.querySelector('.model-description').textContent.toLowerCase();
+                
+                const matches = modelName.includes(searchTerm) || description.includes(searchTerm);
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+        
+        // 新建模型按钮
+        document.querySelector('.toolbar-btn.primary').addEventListener('click', () => {
+            // 跳转到在线建模页面
+            if (parent && parent.loadPage) {
+                parent.loadPage('online-modeling', '在线建模');
+            }
+        });
+
+        // 弹窗交互
+        function openModelModal(url, title) {
+            document.getElementById('modalMask').style.display = 'flex';
+            document.getElementById('modalIframe').src = url;
+            document.getElementById('modalTitle').textContent = title;
+        }
+        function closeModelModal() {
+            document.getElementById('modalMask').style.display = 'none';
+            document.getElementById('modalIframe').src = '';
+        }
+        document.getElementById('newModelBtn').onclick = function() {
+            openModelModal('online-modeling.html', '新建模型');
+        };
+        document.getElementById('importBtn').onclick = function() {
+            openModelModal('ddl-import.html', 'DDL导入');
+        };
+    </script>
+</body>
+</html>

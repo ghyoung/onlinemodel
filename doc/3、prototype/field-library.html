@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准字段库 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .library-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-subtitle {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .category-tree {
+            padding: 16px;
+        }
+        
+        .category-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-item:hover {
+            background: #f0f8ff;
+            color: #1890ff;
+        }
+        
+        .category-item.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .category-icon {
+            font-size: 16px;
+        }
+        
+        .category-name {
+            flex: 1;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .main-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .content-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 300px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .field-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .field-table th {
+            background: #fafafa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .field-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        
+        .field-table tr:hover {
+            background: #fafafa;
+        }
+        
+        .field-name {
+            font-weight: 600;
+            color: #1890ff;
+            cursor: pointer;
+        }
+        
+        .field-name:hover {
+            text-decoration: underline;
+        }
+        
+        .field-type {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        .field-description {
+            color: #595959;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .field-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .field-tag {
+            background: #e6f7ff;
+            color: #1890ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .field-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .action-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+            border-top: 1px solid #e8e8e8;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .page-btn.active {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .recommendation-panel {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .recommendation-title {
+            color: #52c41a;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .recommendation-item {
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .recommendation-item:hover {
+            border-color: #52c41a;
+            box-shadow: 0 2px 8px rgba(82, 196, 26, 0.2);
+        }
+        
+        .recommendation-name {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .recommendation-reason {
+            font-size: 12px;
+            color: #595959;
+        }
+    </style>
+</head>
+<body>
+    <div class="library-container">
+        <div class="page-header">
+            <h1 class="page-title">标准字段库</h1>
+            <p class="page-subtitle">维护标准化的字段定义库，支持字段分类、搜索、推荐等功能</p>
+        </div>
+        
+        <div class="recommendation-panel">
+            <div class="recommendation-title">
+                💡 智能推荐
+            </div>
+            <div class="recommendation-list">
+                <div class="recommendation-item">
+                    <div class="recommendation-name">user_id</div>
+                    <div class="recommendation-reason">基于当前建模上下文推荐，与 user_profile 表匹配度 95%</div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-name">order_amount</div>
+                    <div class="recommendation-reason">基于字段语义分析推荐，适用于订单金额字段</div>
+                </div>
+                <div class="recommendation-item">
+                    <div class="recommendation-name">created_time</div>
+                    <div class="recommendation-reason">基于命名规范推荐，符合时间字段标准命名</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">字段分类</div>
+                    <div class="sidebar-subtitle">按业务域分类管理</div>
+                </div>
+                
+                <div class="category-tree">
+                    <div class="category-item active">
+                        <span class="category-icon">👥</span>
+                        <span class="category-name">用户域</span>
+                        <span class="category-count">156</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">🛒</span>
+                        <span class="category-name">订单域</span>
+                        <span class="category-count">89</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">📦</span>
+                        <span class="category-name">商品域</span>
+                        <span class="category-count">124</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">💰</span>
+                        <span class="category-name">财务域</span>
+                        <span class="category-count">67</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">📊</span>
+                        <span class="category-name">分析域</span>
+                        <span class="category-count">203</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">🔍</span>
+                        <span class="category-name">日志域</span>
+                        <span class="category-count">145</span>
+                    </div>
+                    <div class="category-item">
+                        <span class="category-icon">⚙️</span>
+                        <span class="category-name">系统域</span>
+                        <span class="category-count">78</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="content-title">用户域字段 (156)</div>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="搜索字段名、描述或标签...">
+                        <select class="filter-select">
+                            <option>全部类型</option>
+                            <option>字符串</option>
+                            <option>数值</option>
+                            <option>时间</option>
+                            <option>布尔</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <table class="field-table">
+                    <thead>
+                        <tr>
+                            <th>字段名</th>
+                            <th>数据类型</th>
+                            <th>描述</th>
+                            <th>标签</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="field-name">user_id</div>
+                            </td>
+                            <td>
+                                <span class="field-type">BIGINT</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户唯一标识符，主键，自增</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">主键</span>
+                                    <span class="field-tag">自增</span>
+                                    <span class="field-tag">唯一</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">username</div>
+                            </td>
+                            <td>
+                                <span class="field-type">VARCHAR(50)</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户名，用于登录，唯一</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">唯一</span>
+                                    <span class="field-tag">登录</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">email</div>
+                            </td>
+                            <td>
+                                <span class="field-type">VARCHAR(255)</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户邮箱地址，用于通知和找回密码</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">邮箱</span>
+                                    <span class="field-tag">通知</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">phone</div>
+                            </td>
+                            <td>
+                                <span class="field-type">VARCHAR(20)</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户手机号码，用于短信验证</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">手机</span>
+                                    <span class="field-tag">验证</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">real_name</div>
+                            </td>
+                            <td>
+                                <span class="field-type">VARCHAR(100)</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户真实姓名，用于实名认证</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">姓名</span>
+                                    <span class="field-tag">实名</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">gender</div>
+                            </td>
+                            <td>
+                                <span class="field-type">TINYINT</span>
+                            </td>
+                            <td>
+                                <div class="field-description">性别：1-男，2-女，0-未知</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">枚举</span>
+                                    <span class="field-tag">性别</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">birth_date</div>
+                            </td>
+                            <td>
+                                <span class="field-type">DATE</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户出生日期，用于年龄计算</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">日期</span>
+                                    <span class="field-tag">年龄</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="field-name">created_at</div>
+                            </td>
+                            <td>
+                                <span class="field-type">TIMESTAMP</span>
+                            </td>
+                            <td>
+                                <div class="field-description">用户创建时间，系统自动生成</div>
+                            </td>
+                            <td>
+                                <div class="field-tags">
+                                    <span class="field-tag">时间</span>
+                                    <span class="field-tag">创建</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="field-actions">
+                                    <button class="action-btn">查看</button>
+                                    <button class="action-btn">编辑</button>
+                                    <button class="action-btn primary">使用</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination">
+                    <button class="page-btn" disabled>上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">5</button>
+                    <span style="margin: 0 8px;">...</span>
+                    <button class="page-btn">20</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 分类切换
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                // 更新内容标题
+                const categoryName = item.querySelector('.category-name').textContent;
+                const categoryCount = item.querySelector('.category-count').textContent;
+                document.querySelector('.content-title').textContent = `${categoryName}字段 (${categoryCount})`;
+            });
+        });
+        
+        // 字段名点击
+        document.querySelectorAll('.field-name').forEach(name => {
+            name.addEventListener('click', () => {
+                // 显示字段详情
+                console.log('查看字段详情:', name.textContent);
+            });
+        });
+        
+        // 使用按钮点击
+        document.querySelectorAll('.action-btn.primary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 将字段添加到建模器
+                const fieldName = btn.closest('tr').querySelector('.field-name').textContent;
+                console.log('使用字段:', fieldName);
+                
+                // 显示成功提示
+                btn.textContent = '已添加';
+                btn.style.background = '#52c41a';
+                btn.style.color = '#fff';
+                btn.style.borderColor = '#52c41a';
+                
+                setTimeout(() => {
+                    btn.textContent = '使用';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        });
+        
+        // 搜索功能
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.field-table tbody tr');
+            
+            rows.forEach(row => {
+                const fieldName = row.querySelector('.field-name').textContent.toLowerCase();
+                const description = row.querySelector('.field-description').textContent.toLowerCase();
+                const tags = Array.from(row.querySelectorAll('.field-tag')).map(tag => tag.textContent.toLowerCase());
+                
+                const matches = fieldName.includes(searchTerm) || 
+                              description.includes(searchTerm) || 
+                              tags.some(tag => tag.includes(searchTerm));
+                
+                row.style.display = matches ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

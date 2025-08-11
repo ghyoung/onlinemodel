@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .settings-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .settings-tabs {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+        }
+        
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .tab-btn {
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-btn:hover {
+            color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .tab-btn.active {
+            color: #1890ff;
+            background: #fff;
+            border-bottom-color: #1890ff;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 32px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .checkbox-input {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .checkbox-label {
+            font-size: 14px;
+            color: #262626;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .user-list {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .user-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .user-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1890ff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .user-email {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .user-role {
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .user-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .user-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .user-btn.danger:hover {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .add-user-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 6px;
+            background: #fafafa;
+            color: #8c8c8f;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        
+        .add-user-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .permission-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 16px;
+            background: #fafafa;
+        }
+        
+        .permission-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 12px;
+        }
+        
+        .permission-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .permission-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .permission-checkbox {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .permission-label {
+            font-size: 13px;
+            color: #595959;
+        }
+        
+        .connection-list {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .connection-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .connection-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .connection-item:last-child {
+            border-bottom: none;
+        }
+        
+        .connection-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #52c41a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .connection-info {
+            flex: 1;
+        }
+        
+        .connection-name {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .connection-details {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #52c41a;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #52c41a;
+        }
+        
+        .connection-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .connection-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .connection-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .connection-btn.danger:hover {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .add-connection-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 6px;
+            background: #fafafa;
+            color: #8c8c8f;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        
+        .add-connection-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .save-btn {
+            padding: 12px 24px;
+            background: #1890ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 24px;
+        }
+        
+        .save-btn:hover {
+            background: #40a9ff;
+        }
+        
+        .log-list {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            overflow: hidden;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .log-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 12px;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            color: #8c8c8c;
+            margin-right: 12px;
+        }
+        
+        .log-level {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        
+        .log-level.info {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .log-level.warning {
+            background: #fff7e6;
+            color: #faad14;
+        }
+        
+        .log-level.error {
+            background: #fff1f0;
+            color: #f5222d;
+        }
+        
+        .log-message {
+            color: #262626;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="page-header">
+            <h1 class="page-title">系统设置</h1>
+            <p class="page-subtitle">系统配置和用户管理，包括权限配置、数据源管理等</p>
+        </div>
+        
+        <div class="settings-tabs">
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="switchTab('general')">⚙️ 基本设置</button>
+                <button class="tab-btn" onclick="switchTab('users')">👥 用户管理</button>
+                <button class="tab-btn" onclick="switchTab('permissions')">🔐 权限配置</button>
+                <button class="tab-btn" onclick="switchTab('connections')">🔗 数据源管理</button>
+                <button class="tab-btn" onclick="switchTab('logs')">📋 系统日志</button>
+            </div>
+            
+            <!-- 基本设置 -->
+            <div id="generalTab" class="tab-content active">
+                <div class="section-title">
+                    🏢 系统信息
+                </div>
+                <div class="section-subtitle">
+                    配置系统基本信息，包括系统名称、描述、版本等
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">系统名称</label>
+                        <input type="text" class="form-input" value="湖仓建模工具" placeholder="输入系统名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">系统版本</label>
+                        <input type="text" class="form-input" value="v1.0.0" placeholder="输入系统版本" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">系统描述</label>
+                    <textarea class="form-textarea" placeholder="输入系统描述">湖仓建模工具是一个专业的数据建模平台，支持在线建模、DDL导入、血缘关系分析等功能。</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">管理员邮箱</label>
+                    <input type="email" class="form-input" value="admin@example.com" placeholder="输入管理员邮箱">
+                </div>
+                
+                <div class="section-title" style="margin-top: 32px;">
+                    🌐 界面设置
+                </div>
+                <div class="section-subtitle">
+                    配置界面显示和用户体验相关设置
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">默认语言</label>
+                        <select class="form-select">
+                            <option value="zh-CN" selected>中文 (简体)</option>
+                            <option value="en-US">English</option>
+                            <option value="ja-JP">日本語</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">默认主题</label>
+                        <select class="form-select">
+                            <option value="light" selected>浅色主题</option>
+                            <option value="dark">深色主题</option>
+                            <option value="auto">跟随系统</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" class="checkbox-input" id="autoSave" checked>
+                    <label class="checkbox-label" for="autoSave">启用自动保存</label>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" class="checkbox-input" id="notifications" checked>
+                    <label class="checkbox-label" for="notifications">启用系统通知</label>
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" class="checkbox-input" id="collaboration" checked>
+                    <label class="checkbox-label" for="collaboration">启用实时协作</label>
+                </div>
+                
+                <button class="save-btn">💾 保存设置</button>
+            </div>
+            
+            <!-- 用户管理 -->
+            <div id="usersTab" class="tab-content">
+                <div class="section-title">
+                    👥 用户管理
+                </div>
+                <div class="section-subtitle">
+                    管理系统用户，包括添加、编辑、删除用户和分配角色
+                </div>
+                
+                <div class="user-list">
+                    <div class="user-header">
+                        用户列表 (共 8 人)
+                    </div>
+                    
+                    <div class="user-item">
+                        <div class="user-avatar">张</div>
+                        <div class="user-info">
+                            <div class="user-name">张三</div>
+                            <div class="user-email">zhangsan@example.com</div>
+                        </div>
+                        <div class="user-role">管理员</div>
+                        <div class="user-actions">
+                            <button class="user-btn">编辑</button>
+                            <button class="user-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-item">
+                        <div class="user-avatar">李</div>
+                        <div class="user-info">
+                            <div class="user-name">李四</div>
+                            <div class="user-email">lisi@example.com</div>
+                        </div>
+                        <div class="user-role">开发者</div>
+                        <div class="user-actions">
+                            <button class="user-btn">编辑</button>
+                            <button class="user-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-item">
+                        <div class="user-avatar">王</div>
+                        <div class="user-info">
+                            <div class="user-name">王五</div>
+                            <div class="user-email">wangwu@example.com</div>
+                        </div>
+                        <div class="user-role">分析师</div>
+                        <div class="user-actions">
+                            <button class="user-btn">编辑</button>
+                            <button class="user-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="user-item">
+                        <div class="user-avatar">赵</div>
+                        <div class="user-info">
+                            <div class="user-name">赵六</div>
+                            <div class="user-email">zhaoliu@example.com</div>
+                        </div>
+                        <div class="user-role">查看者</div>
+                        <div class="user-actions">
+                            <button class="user-btn">编辑</button>
+                            <button class="user-btn danger">删除</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-user-btn">
+                    + 添加新用户
+                </div>
+            </div>
+            
+            <!-- 权限配置 -->
+            <div id="permissionsTab" class="tab-content">
+                <div class="section-title">
+                    🔐 权限配置
+                </div>
+                <div class="section-subtitle">
+                    配置不同角色的权限，控制用户对系统功能的访问
+                </div>
+                
+                <div class="permission-grid">
+                    <div class="permission-card">
+                        <div class="permission-title">管理员</div>
+                        <div class="permission-options">
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked disabled>
+                                <label class="permission-label">系统管理</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked disabled>
+                                <label class="permission-label">用户管理</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked disabled>
+                                <label class="permission-label">权限配置</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked disabled>
+                                <label class="permission-label">数据建模</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked disabled>
+                                <label class="permission-label">数据治理</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-card">
+                        <div class="permission-title">开发者</div>
+                        <div class="permission-options">
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">数据建模</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">DDL导入</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">血缘关系</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">数据治理</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">系统设置</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-card">
+                        <div class="permission-title">分析师</div>
+                        <div class="permission-options">
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">数据建模</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">血缘关系</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">DDL导入</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">数据治理</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">系统设置</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="permission-card">
+                        <div class="permission-title">查看者</div>
+                        <div class="permission-options">
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox" checked>
+                                <label class="permission-label">数据建模</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">血缘关系</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">DDL导入</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">数据治理</label>
+                            </div>
+                            <div class="permission-option">
+                                <input type="checkbox" class="permission-checkbox">
+                                <label class="permission-label">系统设置</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="save-btn">💾 保存权限</button>
+            </div>
+            
+            <!-- 数据源管理 -->
+            <div id="connectionsTab" class="tab-content">
+                <div class="section-title">
+                    🔗 数据源管理
+                </div>
+                <div class="section-subtitle">
+                    管理系统连接的数据源，包括数据库连接、API接口等
+                </div>
+                
+                <div class="connection-list">
+                    <div class="connection-header">
+                        数据源列表 (共 5 个)
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">🐘</div>
+                        <div class="connection-info">
+                            <div class="connection-name">生产环境PostgreSQL</div>
+                            <div class="connection-details">postgresql://prod.example.com:5432/warehouse</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            连接正常
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">测试</button>
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">🐬</div>
+                        <div class="connection-info">
+                            <div class="connection-name">测试环境MySQL</div>
+                            <div class="connection-details">mysql://test.example.com:3306/testdb</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            连接正常
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">测试</button>
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">🍯</div>
+                        <div class="connection-info">
+                            <div class="connection-name">Hive数据仓库</div>
+                            <div class="connection-details">hive://hive.example.com:10000/default</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            连接正常
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">测试</button>
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-connection-btn">
+                    + 添加新数据源
+                </div>
+            </div>
+            
+            <!-- 系统日志 -->
+            <div id="logsTab" class="tab-content">
+                <div class="section-title">
+                    📋 系统日志
+                </div>
+                <div class="section-subtitle">
+                    查看系统运行日志，包括操作记录、错误日志等
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">日志级别</label>
+                        <select class="form-select">
+                            <option value="all" selected>全部级别</option>
+                            <option value="info">信息</option>
+                            <option value="warning">警告</option>
+                            <option value="error">错误</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">时间范围</label>
+                        <select class="form-select">
+                            <option value="1h">最近1小时</option>
+                            <option value="24h" selected>最近24小时</option>
+                            <option value="7d">最近7天</option>
+                            <option value="30d">最近30天</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="log-list">
+                    <div class="log-header">
+                        系统日志
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:30:25</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">用户 张三 登录系统</span>
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:28:10</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">数据源 生产环境PostgreSQL 连接测试成功</span>
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:25:45</span>
+                        <span class="log-level warning">WARN</span>
+                        <span class="log-message">数据源 测试环境MySQL 连接响应时间超过阈值</span>
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:20:12</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">用户 李四 创建了新表 user_profile</span>
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:15:30</span>
+                        <span class="log-level error">ERROR</span>
+                        <span class="log-message">数据源 Hive数据仓库 连接失败: Connection timeout</span>
+                    </div>
+                    
+                    <div class="log-item">
+                        <span class="log-time">2024-01-15 15:10:18</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">系统启动完成，版本 v1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换
+        function switchTab(tabName) {
+            // 隐藏所有标签页内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签页按钮的active状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 显示选中的标签页内容
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // 设置选中标签页按钮的active状态
+            event.target.classList.add('active');
+        }
+        
+        // 保存设置按钮
+        document.querySelector('.save-btn').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.textContent;
+            
+            btn.textContent = '💾 保存中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = '✅ 保存成功';
+                btn.style.background = '#52c41a';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.style.background = '#1890ff';
+                }, 2000);
+            }, 1000);
+        });
+        
+        // 用户操作按钮
+        document.querySelectorAll('.user-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const userName = btn.closest('.user-item').querySelector('.user-name').textContent;
+                
+                if (action === '编辑') {
+                    console.log('编辑用户:', userName);
+                } else if (action === '删除') {
+                    if (confirm(`确定要删除用户 "${userName}" 吗？`)) {
+                        console.log('删除用户:', userName);
+                    }
+                }
+            });
+        });
+        
+        // 添加用户按钮
+        document.querySelector('.add-user-btn').addEventListener('click', () => {
+            console.log('添加新用户');
+            // 这里可以打开添加用户的弹窗
+        });
+        
+        // 数据源操作按钮
+        document.querySelectorAll('.connection-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const connectionName = btn.closest('.connection-item').querySelector('.connection-name').textContent;
+                
+                if (action === '测试') {
+                    console.log('测试连接:', connectionName);
+                } else if (action === '编辑') {
+                    console.log('编辑连接:', connectionName);
+                } else if (action === '删除') {
+                    if (confirm(`确定要删除数据源 "${connectionName}" 吗？`)) {
+                        console.log('删除数据源:', connectionName);
+                    }
+                }
+            });
+        });
+        
+        // 添加数据源按钮
+        document.querySelector('.add-connection-btn').addEventListener('click', () => {
+            console.log('添加新数据源');
+            // 这里可以打开添加数据源的弹窗
+        });
+        
+        // 权限复选框
+        document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const permissionName = checkbox.nextElementSibling.textContent;
+                const roleName = checkbox.closest('.permission-card').querySelector('.permission-title').textContent;
+                const isChecked = checkbox.checked;
+                
+                console.log(`${roleName} - ${permissionName}: ${isChecked ? '启用' : '禁用'}`);
+            });
+        });
+    </script>
+</body>
+</html>

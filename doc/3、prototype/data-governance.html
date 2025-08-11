@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据治理 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .governance-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .overview-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .overview-card .icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        
+        .overview-card .number {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 8px;
+        }
+        
+        .overview-card .label {
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .overview-card.warning .number {
+            color: #faad14;
+        }
+        
+        .overview-card.error .number {
+            color: #f5222d;
+        }
+        
+        .overview-card.success .number {
+            color: #52c41a;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .content-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .content-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .content-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .content-body {
+            padding: 20px;
+        }
+        
+        .rule-item {
+            padding: 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: #fafafa;
+        }
+        
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .rule-name {
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .rule-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .rule-status.active {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .rule-status.inactive {
+            background: #fff2e8;
+            color: #faad14;
+        }
+        
+        .rule-status.error {
+            background: #fff1f0;
+            color: #f5222d;
+        }
+        
+        .rule-description {
+            color: #595959;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .rule-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .rule-metric {
+            text-align: center;
+            padding: 8px;
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .metric-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 4px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #8c8c8f;
+        }
+        
+        .rule-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .rule-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .rule-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .rule-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .quality-chart {
+            height: 200px;
+            background: #fafafa;
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .issue-list {
+            list-style: none;
+        }
+        
+        .issue-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .issue-item:last-child {
+            border-bottom: none;
+        }
+        
+        .issue-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .issue-icon.warning {
+            background: #fff7e6;
+            color: #faad14;
+        }
+        
+        .issue-icon.error {
+            background: #fff1f0;
+            color: #f5222d;
+        }
+        
+        .issue-content {
+            flex: 1;
+        }
+        
+        .issue-title {
+            font-size: 14px;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .issue-details {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .issue-time {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .add-rule-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 6px;
+            background: #fafafa;
+            color: #8c8c8f;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .add-rule-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #1890ff;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-fill.warning {
+            background: #faad14;
+        }
+        
+        .progress-fill.error {
+            background: #f5222d;
+        }
+        
+        .progress-fill.success {
+            background: #52c41a;
+        }
+    </style>
+</head>
+<body>
+    <div class="governance-container">
+        <div class="page-header">
+            <h1 class="page-title">数据治理</h1>
+            <p class="page-subtitle">提供智能化的数据治理能力，包括质量检测、规则配置、治理报告等</p>
+        </div>
+        
+        <div class="overview-grid">
+            <div class="overview-card success">
+                <div class="icon">✅</div>
+                <div class="number">98.5%</div>
+                <div class="label">数据质量评分</div>
+            </div>
+            <div class="overview-card">
+                <div class="icon">🛡️</div>
+                <div class="number">24</div>
+                <div class="label">活跃治理规则</div>
+            </div>
+            <div class="overview-card warning">
+                <div class="icon">⚠️</div>
+                <div class="number">12</div>
+                <div class="label">待处理问题</div>
+            </div>
+            <div class="overview-card error">
+                <div class="icon">❌</div>
+                <div class="number">3</div>
+                <div class="label">严重问题</div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="content-header">
+                    <div class="content-title">治理规则</div>
+                    <div class="content-subtitle">配置和管理数据质量规则</div>
+                </div>
+                
+                <div class="content-body">
+                    <div class="rule-item">
+                        <div class="rule-header">
+                            <span class="rule-name">字段完整性检查</span>
+                            <span class="rule-status active">活跃</span>
+                        </div>
+                        <div class="rule-description">
+                            检查必填字段是否为空，确保数据完整性
+                        </div>
+                        <div class="rule-metrics">
+                            <div class="rule-metric">
+                                <div class="metric-number">99.2%</div>
+                                <div class="metric-label">通过率</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">156</div>
+                                <div class="metric-label">检查表</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">2</div>
+                                <div class="metric-label">问题数</div>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <button class="rule-btn">查看详情</button>
+                            <button class="rule-btn">编辑</button>
+                            <button class="rule-btn">停用</button>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-header">
+                            <span class="rule-name">数据类型验证</span>
+                            <span class="rule-status active">活跃</span>
+                        </div>
+                        <div class="rule-description">
+                            验证字段数据类型是否符合预期，防止类型错误
+                        </div>
+                        <div class="rule-metrics">
+                            <div class="rule-metric">
+                                <div class="metric-number">98.7%</div>
+                                <div class="metric-label">通过率</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">2,847</div>
+                                <div class="metric-label">检查字段</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">5</div>
+                                <div class="metric-label">问题数</div>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <button class="rule-btn">查看详情</button>
+                            <button class="rule-btn">编辑</button>
+                            <button class="rule-btn">停用</button>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-item">
+                        <div class="rule-header">
+                            <span class="rule-name">数据格式检查</span>
+                            <span class="rule-status warning">警告</span>
+                        </div>
+                        <div class="rule-description">
+                            检查邮箱、手机号等字段格式是否符合标准
+                        </div>
+                        <div class="rule-metrics">
+                            <div class="rule-metric">
+                                <div class="metric-number">95.1%</div>
+                                <div class="metric-label">通过率</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">89</div>
+                                <div class="metric-label">检查字段</div>
+                            </div>
+                            <div class="rule-metric">
+                                <div class="metric-number">12</div>
+                                <div class="metric-label">问题数</div>
+                            </div>
+                        </div>
+                        <div class="rule-actions">
+                            <button class="rule-btn">查看详情</button>
+                            <button class="rule-btn">编辑</button>
+                            <button class="rule-btn primary">启用</button>
+                        </div>
+                    </div>
+                    
+                    <div class="add-rule-btn">
+                        + 添加新规则
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <div class="content-header">
+                    <div class="content-title">质量监控</div>
+                    <div class="content-subtitle">实时监控数据质量状况</div>
+                </div>
+                
+                <div class="content-body">
+                    <div class="quality-chart">
+                        数据质量趋势图表
+                        <br>
+                        (支持时间范围选择、指标对比等)
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #262626;">整体质量</span>
+                            <span style="font-size: 14px; color: #1890ff;">98.5%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: 98.5%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #262626;">数据完整性</span>
+                            <span style="font-size: 14px; color: #52c41a;">99.2%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: 99.2%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #262626;">数据准确性</span>
+                            <span style="font-size: 14px; color: #faad14;">95.1%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill warning" style="width: 95.1%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 14px; color: #262626;">数据一致性</span>
+                            <span style="font-size: 14px; color: #52c41a;">97.8%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: 97.8%;"></div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 24px 0 16px 0; color: #262626;">最近问题</h4>
+                    
+                    <ul class="issue-list">
+                        <li class="issue-item">
+                            <div class="issue-icon warning">⚠️</div>
+                            <div class="issue-content">
+                                <div class="issue-title">邮箱格式异常</div>
+                                <div class="issue-details">user_profile.email 字段存在 5 个格式不正确的邮箱地址</div>
+                            </div>
+                            <div class="issue-time">2小时前</div>
+                        </li>
+                        <li class="issue-item">
+                            <div class="issue-icon warning">⚠️</div>
+                            <div class="issue-content">
+                                <div class="issue-title">手机号格式异常</div>
+                                <div class="issue-details">user_profile.phone 字段存在 3 个格式不正确的手机号</div>
+                            </div>
+                            <div class="issue-time">4小时前</div>
+                        </li>
+                        <li class="issue-item">
+                            <div class="issue-icon error">❌</div>
+                            <div class="issue-content">
+                                <div class="issue-title">必填字段为空</div>
+                                <div class="issue-details">order_info.user_id 字段存在 2 个空值</div>
+                            </div>
+                            <div class="issue-time">6小时前</div>
+                        </li>
+                        <li class="issue-item">
+                            <div class="issue-icon warning">⚠️</div>
+                            <div class="issue-content">
+                                <div class="issue-title">数据类型不匹配</div>
+                                <div class="issue-details">product_info.price 字段存在 1 个非数值类型数据</div>
+                            </div>
+                            <div class="issue-time">8小时前</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 规则操作按钮
+        document.querySelectorAll('.rule-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const ruleName = btn.closest('.rule-item').querySelector('.rule-name').textContent;
+                
+                if (action === '停用') {
+                    btn.textContent = '启用';
+                    btn.classList.add('primary');
+                    btn.closest('.rule-item').querySelector('.rule-status').textContent = '停用';
+                    btn.closest('.rule-item').querySelector('.rule-status').className = 'rule-status inactive';
+                } else if (action === '启用') {
+                    btn.textContent = '停用';
+                    btn.classList.remove('primary');
+                    btn.closest('.rule-item').querySelector('.rule-status').textContent = '活跃';
+                    btn.closest('.rule-item').querySelector('.rule-status').className = 'rule-status active';
+                }
+                
+                console.log(`${action}规则:`, ruleName);
+            });
+        });
+        
+        // 添加规则按钮
+        document.querySelector('.add-rule-btn').addEventListener('click', () => {
+            console.log('添加新规则');
+            // 这里可以打开添加规则的弹窗
+        });
+        
+        // 问题项点击
+        document.querySelectorAll('.issue-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const issueTitle = item.querySelector('.issue-title').textContent;
+                console.log('查看问题详情:', issueTitle);
+                // 这里可以打开问题详情弹窗
+            });
+        });
+        
+        // 规则详情查看
+        document.querySelectorAll('.rule-btn').forEach(btn => {
+            if (btn.textContent === '查看详情') {
+                btn.addEventListener('click', () => {
+                    const ruleName = btn.closest('.rule-item').querySelector('.rule-name').textContent;
+                    console.log('查看规则详情:', ruleName);
+                    // 这里可以打开规则详情弹窗
+                });
+            }
+        });
+    </script>
+</body>
+</html>

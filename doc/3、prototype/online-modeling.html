@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线建模 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .modeling-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .toolbar-btn.primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .toolbar-btn.primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .toolbar-btn.danger {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        .toolbar-btn.danger:hover {
+            background: #ff4d4f;
+            color: #fff;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #e8e8e8;
+            margin: 0 12px;
+        }
+        
+        .table-name-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 200px;
+            margin-right: 16px;
+        }
+        
+        .table-name-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .collaboration-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #52c41a;
+            font-size: 14px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #52c41a;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #fff;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-tab.active {
+            border-bottom-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        .field-item {
+            padding: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background: #fafafa;
+            cursor: move;
+        }
+        
+        .field-item:hover {
+            border-color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .field-name {
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .field-type {
+            font-size: 12px;
+            color: #8c8c8c;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .field-description {
+            font-size: 12px;
+            color: #595959;
+        }
+        
+        .table-editor {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .table-description {
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .table-grid {
+            flex: 1;
+            padding: 24px;
+            overflow: auto;
+        }
+        
+        .table-container {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-header-row {
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .table-header-cell {
+            padding: 12px 16px;
+            font-weight: 600;
+            color: #262626;
+            border-right: 1px solid #e8e8e8;
+            min-width: 120px;
+        }
+        
+        .table-header-cell:last-child {
+            border-right: none;
+        }
+        
+        .table-row {
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+        }
+        
+        .table-row:hover {
+            background: #fafafa;
+        }
+        
+        .table-cell {
+            padding: 12px 16px;
+            border-right: 1px solid #f0f0f0;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .table-cell:last-child {
+            border-right: none;
+        }
+        
+        .cell-input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+        }
+        
+        .cell-input:focus {
+            outline: none;
+            background: #fff;
+            border: 1px solid #1890ff;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        
+        .add-row-btn {
+            padding: 12px 24px;
+            background: #f0f0f0;
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            color: #8c8c8f;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 16px;
+            transition: all 0.3s;
+        }
+        
+        .add-row-btn:hover {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .field-actions {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .field-action-btn {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .field-action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .field-action-btn.danger:hover {
+            border-color: #ff4d4f;
+            color: #ff4d4f;
+        }
+        
+        /* 新增的交互功能样式 */
+        .field-type-selector {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .field-type-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .field-type-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .field-type-option:hover {
+            background: #f5f5f5;
+        }
+        
+        .field-type-option.selected {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .field-type-category {
+            padding: 8px 16px;
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .validation-error {
+            border-color: #ff4d4f !important;
+            background: #fff2f0;
+        }
+        
+        .validation-message {
+            font-size: 12px;
+            color: #ff4d4f;
+            margin-top: 4px;
+        }
+        
+        .drag-over {
+            background: #e6f7ff;
+            border: 2px dashed #1890ff;
+        }
+        
+        .field-constraints {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .constraint-tag {
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+            cursor: pointer;
+        }
+        
+        .constraint-tag:hover {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .constraint-tag.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .table-properties {
+            background: #fafafa;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        
+        .property-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .property-label {
+            width: 120px;
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        .property-input {
+            flex: 1;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .property-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .collaboration-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        
+        .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #1890ff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .user-list {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .undo-redo-stack {
+            display: flex;
+            gap: 8px;
+            margin-left: 16px;
+        }
+        
+        .stack-indicator {
+            padding: 4px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #595959;
+        }
+    </style>
+</head>
+<body>
+    <div class="modeling-container">
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <input type="text" class="table-name-input" placeholder="输入表名..." value="user_profile">
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="saveBtn">
+                    💾 保存
+                </button>
+                <div class="undo-redo-stack">
+                    <button class="toolbar-btn" id="undoBtn" disabled>
+                        ↩️ 撤销
+                    </button>
+                    <button class="toolbar-btn" id="redoBtn" disabled>
+                        ↪️ 重做
+                    </button>
+                    <span class="stack-indicator">撤销: 0 | 重做: 0</span>
+                </div>
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn">
+                    📥 导入
+                </button>
+                <button class="toolbar-btn">
+                    📤 导出
+                </button>
+                <button class="toolbar-btn">
+                    🔍 预览SQL
+                </button>
+            </div>
+            
+            <div class="toolbar-right">
+                <div class="collaboration-status">
+                    <div class="status-dot"></div>
+                    实时协作中 - 3人在线
+                </div>
+                <button class="toolbar-btn primary">
+                    🚀 发布模型
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-tabs">
+                    <div class="sidebar-tab active">字段库</div>
+                    <div class="sidebar-tab">关系</div>
+                    <div class="sidebar-tab">索引</div>
+                    <div class="sidebar-tab">模板</div>
+                </div>
+                
+                <div class="sidebar-content">
+                    <div class="field-item" draggable="true" data-field-type="BIGINT">
+                        <div class="field-header">
+                            <span class="field-name">id</span>
+                            <span class="field-type">BIGINT</span>
+                        </div>
+                        <div class="field-description">主键ID，自增</div>
+                    </div>
+                    
+                    <div class="field-item" draggable="true" data-field-type="VARCHAR">
+                        <div class="field-header">
+                            <span class="field-name">name</span>
+                            <span class="field-type">VARCHAR(100)</span>
+                        </div>
+                        <div class="field-description">用户姓名</div>
+                    </div>
+                    
+                    <div class="field-item" draggable="true" data-field-type="VARCHAR">
+                        <div class="field-header">
+                            <span class="field-name">email</span>
+                            <span class="field-type">VARCHAR(255)</span>
+                        </div>
+                        <div class="field-description">邮箱地址</div>
+                    </div>
+                    
+                    <div class="field-item" draggable="true" data-field-type="TIMESTAMP">
+                        <div class="field-header">
+                            <span class="field-name">created_at</span>
+                            <span class="field-type">TIMESTAMP</span>
+                        </div>
+                        <div class="field-description">创建时间</div>
+                    </div>
+                    
+                    <div class="field-item" draggable="true" data-field-type="TIMESTAMP">
+                        <div class="field-header">
+                            <span class="field-name">updated_at</span>
+                            <span class="field-type">TIMESTAMP</span>
+                        </div>
+                        <div class="field-description">更新时间</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-editor">
+                <div class="table-header">
+                    <div class="table-title">用户档案表 (user_profile)</div>
+                    <div class="table-description">存储用户基本信息和档案数据</div>
+                </div>
+                
+                <div class="table-properties">
+                    <div class="property-row">
+                        <div class="property-label">表注释:</div>
+                        <input type="text" class="property-input" value="用户档案表" placeholder="输入表注释...">
+                    </div>
+                    <div class="property-row">
+                        <div class="property-label">存储引擎:</div>
+                        <select class="property-input">
+                            <option>InnoDB</option>
+                            <option>MyISAM</option>
+                            <option>Memory</option>
+                        </select>
+                    </div>
+                    <div class="property-row">
+                        <div class="property-label">字符集:</div>
+                        <select class="property-input">
+                            <option>utf8mb4</option>
+                            <option>utf8</option>
+                            <option>latin1</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="collaboration-indicator">
+                    <span>👥 当前在线用户:</span>
+                    <div class="user-list">
+                        <div class="user-avatar">张</div>
+                        <div class="user-avatar">李</div>
+                        <div class="user-avatar">王</div>
+                    </div>
+                    <span>正在编辑字段: name</span>
+                </div>
+                
+                <div class="table-grid">
+                    <div class="table-container">
+                        <div class="table-header-row">
+                            <div class="table-header-cell">字段名</div>
+                            <div class="table-header-cell">数据类型</div>
+                            <div class="table-header-cell">长度/值</div>
+                            <div class="table-header-cell">是否为空</div>
+                            <div class="table-header-cell">默认值</div>
+                            <div class="table-header-cell">注释</div>
+                            <div class="table-header-cell">约束</div>
+                            <div class="table-header-cell">操作</div>
+                        </div>
+                        
+                        <div class="table-row" data-field-id="1">
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="id" data-field="name">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-type-selector">
+                                    <span class="cell-input" data-field="type">BIGINT</span>
+                                    <div class="field-type-dropdown" style="display: none;">
+                                        <div class="field-type-category">数值类型</div>
+                                        <div class="field-type-option" data-type="BIGINT">BIGINT</div>
+                                        <div class="field-type-option" data-type="INT">INT</div>
+                                        <div class="field-type-option" data-type="SMALLINT">SMALLINT</div>
+                                        <div class="field-type-category">字符串类型</div>
+                                        <div class="field-type-option" data-type="VARCHAR">VARCHAR</div>
+                                        <div class="field-type-option" data-type="CHAR">CHAR</div>
+                                        <div class="field-type-category">时间类型</div>
+                                        <div class="field-type-option" data-type="TIMESTAMP">TIMESTAMP</div>
+                                        <div class="field-type-option" data-type="DATETIME">DATETIME</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="" data-field="length">
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input" data-field="nullable">
+                                    <option value="NOT NULL">NOT NULL</option>
+                                    <option value="NULL">NULL</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="AUTO_INCREMENT" data-field="default">
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="主键ID，自增" data-field="comment">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-constraints">
+                                    <span class="constraint-tag active">PK</span>
+                                    <span class="constraint-tag">AI</span>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-actions">
+                                    <button class="field-action-btn">编辑</button>
+                                    <button class="field-action-btn danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-row" data-field-id="2">
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="name" data-field="name">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-type-selector">
+                                    <span class="cell-input" data-field="type">VARCHAR</span>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="100" data-field="length">
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input" data-field="nullable">
+                                    <option value="NOT NULL">NOT NULL</option>
+                                    <option value="NULL" selected>NULL</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="" data-field="default">
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="用户姓名" data-field="comment">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-constraints">
+                                    <span class="constraint-tag">UQ</span>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-actions">
+                                    <button class="field-action-btn">编辑</button>
+                                    <button class="field-action-btn danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-row" data-field-id="3">
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="email" data-field="name">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-type-selector">
+                                    <span class="cell-input" data-field="type">VARCHAR</span>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="255" data-field="length">
+                            </div>
+                            <div class="table-cell">
+                                <select class="cell-input" data-field="nullable">
+                                    <option value="NOT NULL">NOT NULL</option>
+                                    <option value="NULL" selected>NULL</option>
+                                </select>
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="" data-field="default">
+                            </div>
+                            <div class="table-cell">
+                                <input type="text" class="cell-input" value="邮箱地址" data-field="comment">
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-constraints">
+                                    <span class="constraint-tag">UQ</span>
+                                    <span class="constraint-tag">IDX</span>
+                                </div>
+                            </div>
+                            <div class="table-cell">
+                                <div class="field-actions">
+                                    <button class="field-action-btn">编辑</button>
+                                    <button class="field-action-btn danger">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="add-row-btn" id="addFieldBtn">
+                            + 添加字段
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 拖拽功能
+        document.querySelectorAll('.field-item').forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.textContent);
+            });
+        });
+        
+        // 表格行点击编辑
+        document.querySelectorAll('.table-row').forEach(row => {
+            row.addEventListener('click', () => {
+                row.style.background = '#f0f8ff';
+            });
+        });
+        
+        // 输入框聚焦效果
+        document.querySelectorAll('.cell-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.style.background = '#f0f8ff';
+            });
+            
+            input.addEventListener('blur', () => {
+                input.parentElement.style.background = '';
+            });
+        });
+
+        // 字段类型选择器
+        document.querySelectorAll('.field-type-selector').forEach(selector => {
+            const dropdown = selector.querySelector('.field-type-dropdown');
+            const typeSpan = selector.querySelector('[data-field="type"]');
+            
+            typeSpan.addEventListener('click', () => {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            selector.querySelectorAll('.field-type-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    typeSpan.textContent = option.dataset.type;
+                    dropdown.style.display = 'none';
+                });
+            });
+        });
+        
+        // 点击外部关闭下拉框
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.field-type-selector')) {
+                document.querySelectorAll('.field-type-dropdown').forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+        
+        // 添加字段
+        document.getElementById('addFieldBtn').addEventListener('click', () => {
+            const tableContainer = document.querySelector('.table-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'table-row';
+            newRow.dataset.fieldId = Date.now();
+            newRow.innerHTML = `
+                <div class="table-cell">
+                    <input type="text" class="cell-input" value="" data-field="name" placeholder="字段名">
+                </div>
+                <div class="table-cell">
+                    <div class="field-type-selector">
+                        <span class="cell-input" data-field="type">VARCHAR</span>
+                    </div>
+                </div>
+                <div class="table-cell">
+                    <input type="text" class="cell-input" value="" data-field="length" placeholder="长度">
+                </div>
+                <div class="table-cell">
+                    <select class="cell-input" data-field="nullable">
+                        <option value="NOT NULL">NOT NULL</option>
+                        <option value="NULL" selected>NULL</option>
+                    </select>
+                </div>
+                <div class="table-cell">
+                    <input type="text" class="cell-input" value="" data-field="default" placeholder="默认值">
+                </div>
+                <div class="table-cell">
+                    <input type="text" class="cell-input" value="" data-field="comment" placeholder="注释">
+                </div>
+                <div class="table-cell">
+                    <div class="field-constraints">
+                        <span class="constraint-tag">PK</span>
+                        <span class="constraint-tag">UQ</span>
+                        <span class="constraint-tag">IDX</span>
+                    </div>
+                </div>
+                <div class="table-cell">
+                    <div class="field-actions">
+                        <button class="field-action-btn">编辑</button>
+                        <button class="field-action-btn danger">删除</button>
+                    </div>
+                </div>
+            `;
+            
+            tableContainer.insertBefore(newRow, document.getElementById('addFieldBtn'));
+        });
+        
+        // 删除字段
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('danger')) {
+                if (confirm('确定要删除这个字段吗？')) {
+                    e.target.closest('.table-row').remove();
+                }
+            }
+        });
+        
+        // 约束标签切换
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('constraint-tag')) {
+                e.target.classList.toggle('active');
+            }
+        });
+        
+        // 保存按钮
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            alert('模型已保存！');
+        });
+        
+        // 撤销重做按钮状态管理
+        let undoStack = [];
+        let redoStack = [];
+        
+        function updateUndoRedoState() {
+            document.getElementById('undoBtn').disabled = undoStack.length === 0;
+            document.getElementById('redoBtn').disabled = redoStack.length === 0;
+            document.querySelector('.stack-indicator').textContent = `撤销: ${undoStack.length} | 重做: ${redoStack.length}`;
+        }
+        
+        updateUndoRedoState();
+    </script>
+</body>
+</html>

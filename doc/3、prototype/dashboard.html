@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表板 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .stat-card .icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .label {
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        
+        .main-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-content {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title .icon {
+            margin-right: 8px;
+            color: #1890ff;
+        }
+        
+        .activity-list {
+            list-style: none;
+        }
+        
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 14px;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .quick-action-btn {
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 13px;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #fafafa;
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online {
+            background: #52c41a;
+        }
+        
+        .status-warning {
+            background: #faad14;
+        }
+        
+        .status-error {
+            background: #f5222d;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h1 class="page-title">仪表板</h1>
+            <p class="page-subtitle">系统概览和关键指标展示</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon">🗄️</div>
+                <div class="number">156</div>
+                <div class="label">数据表总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">📊</div>
+                <div class="number">2,847</div>
+                <div class="label">字段总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">👥</div>
+                <div class="number">23</div>
+                <div class="label">活跃用户</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon">✅</div>
+                <div class="number">98.5%</div>
+                <div class="label">数据质量</div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="main-content">
+                <h2 class="section-title">
+                    <span class="icon">📈</span>
+                    数据质量趋势
+                </h2>
+                <div class="chart-placeholder">
+                    数据质量趋势图表区域
+                    <br>
+                    (支持时间范围选择、指标对比等)
+                </div>
+                
+                <h2 class="section-title" style="margin-top: 24px;">
+                    <span class="icon">🔍</span>
+                    最近活动
+                </h2>
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <div class="activity-icon">✏️</div>
+                        <div class="activity-content">
+                            <div class="activity-title">张三 创建了新表 "user_profile"</div>
+                            <div class="activity-time">2分钟前</div>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">📥</div>
+                        <div class="activity-content">
+                            <div class="activity-title">李四 导入了DDL文件 "order_system.sql"</div>
+                            <div class="activity-time">15分钟前</div>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">🔄</div>
+                        <div class="activity-content">
+                            <div class="activity-title">王五 更新了表 "product_info" 的字段定义</div>
+                            <div class="activity-time">1小时前</div>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">📚</div>
+                        <div class="activity-content">
+                            <div class="activity-title">系统 自动检测到数据质量问题</div>
+                            <div class="activity-time">2小时前</div>
+                        </div>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon">🛡️</div>
+                        <div class="activity-content">
+                            <div class="activity-title">赵六 配置了新的数据治理规则</div>
+                            <div class="activity-time">3小时前</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-content">
+                <h2 class="section-title">
+                    <span class="icon">⚡</span>
+                    快速操作
+                </h2>
+                <div class="quick-actions">
+                    <div class="quick-action-btn" onclick="parent.loadPage('online-modeling', '在线建模')">
+                        ✏️ 新建模型
+                    </div>
+                    <div class="quick-action-btn" onclick="parent.loadPage('ddl-import', 'DDL导入')">
+                        📥 导入DDL
+                    </div>
+                    <div class="quick-action-btn" onclick="parent.loadPage('lineage', '血缘关系')">
+                        🔗 查看血缘
+                    </div>
+                    <div class="quick-action-btn" onclick="parent.loadPage('data-governance', '数据治理')">
+                        🛡️ 治理报告
+                    </div>
+                </div>
+                
+                <h2 class="section-title" style="margin-top: 24px;">
+                    <span class="icon">🖥️</span>
+                    系统状态
+                </h2>
+                <div style="margin-bottom: 12px;">
+                    <span class="status-indicator status-online"></span>
+                    数据库连接 - 正常
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <span class="status-indicator status-online"></span>
+                    搜索引擎 - 正常
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <span class="status-indicator status-warning"></span>
+                    缓存服务 - 警告
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <span class="status-indicator status-online"></span>
+                    文件存储 - 正常
+                </div>
+                
+                <h2 class="section-title" style="margin-top: 24px;">
+                    <span class="icon">📊</span>
+                    数据概览
+                </h2>
+                <div style="font-size: 14px; color: #595959; line-height: 1.6;">
+                    <div style="margin-bottom: 8px;">• 今日新增表: 3</div>
+                    <div style="margin-bottom: 8px;">• 今日修改表: 12</div>
+                    <div style="margin-bottom: 8px;">• 待审核变更: 5</div>
+                    <div style="margin-bottom: 8px;">• 数据质量告警: 2</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

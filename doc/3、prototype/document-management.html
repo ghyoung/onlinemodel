@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档管理 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .document-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .toolbar {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .toolbar-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .toolbar-btn.primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .toolbar-btn.primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .sidebar {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-subtitle {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .document-tree {
+            padding: 16px;
+        }
+        
+        .tree-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tree-item:hover {
+            background: #f0f8ff;
+            color: #1890ff;
+        }
+        
+        .tree-item.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .tree-item.folder {
+            font-weight: 600;
+        }
+        
+        .tree-item.file {
+            padding-left: 32px;
+        }
+        
+        .tree-icon {
+            font-size: 16px;
+        }
+        
+        .tree-name {
+            flex: 1;
+        }
+        
+        .tree-status {
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .main-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .content-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .view-btn {
+            padding: 8px 12px;
+            border: none;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .view-btn.active {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .document-list {
+            padding: 20px;
+        }
+        
+        .document-item {
+            padding: 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: #fafafa;
+            transition: all 0.3s;
+        }
+        
+        .document-item:hover {
+            border-color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .document-title {
+            font-weight: 600;
+            color: #262626;
+            font-size: 16px;
+        }
+        
+        .document-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .document-description {
+            color: #595959;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .document-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .document-tag {
+            background: #e6f7ff;
+            color: #1890ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .action-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .document-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fff;
+        }
+        
+        .document-card:hover {
+            border-color: #1890ff;
+            box-shadow: 0 4px 16px rgba(24, 144, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .document-card-header {
+            padding: 16px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .document-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .document-card-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .document-card-body {
+            padding: 16px;
+        }
+        
+        .document-card-description {
+            color: #595959;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 16px;
+        }
+        
+        .document-card-tags {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .document-card-tag {
+            background: #f0f0f0;
+            color: #595959;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .document-card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .card-action-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .card-action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .card-action-btn.primary:hover {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .collaboration-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #52c41a;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #52c41a;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .add-document-btn {
+            width: 100%;
+            padding: 16px;
+            border: 2px dashed #d9d9d9;
+            border-radius: 6px;
+            background: #fafafa;
+            color: #8c8c8f;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        
+        .add-document-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <div class="page-header">
+            <h1 class="page-title">文档管理</h1>
+            <p class="page-subtitle">管理建模文档和协作，支持版本历史、协作状态、评论系统等</p>
+        </div>
+        
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索文档标题、内容或标签...">
+                <select class="filter-select">
+                    <option>全部类型</option>
+                    <option>需求文档</option>
+                    <option>设计文档</option>
+                    <option>技术文档</option>
+                    <option>用户手册</option>
+                </select>
+                <select class="filter-select">
+                    <option>全部状态</option>
+                    <option>草稿</option>
+                    <option>审核中</option>
+                    <option>已发布</option>
+                    <option>已归档</option>
+                </select>
+            </div>
+            
+            <div class="toolbar-actions">
+                <button class="toolbar-btn">
+                    📥 导入
+                </button>
+                <button class="toolbar-btn primary">
+                    ✏️ 新建文档
+                </button>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">文档结构</div>
+                    <div class="sidebar-subtitle">按项目分类管理</div>
+                </div>
+                
+                <div class="document-tree">
+                    <div class="tree-item folder active">
+                        <span class="tree-icon">📁</span>
+                        <span class="tree-name">湖仓建模项目</span>
+                        <span class="tree-status">12</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">项目需求文档</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">技术架构设计</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">数据模型设计</span>
+                    </div>
+                    <div class="tree-item folder">
+                        <span class="tree-icon">📁</span>
+                        <span class="tree-name">用户域设计</span>
+                        <span class="tree-status">8</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">用户表结构设计</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">用户权限设计</span>
+                    </div>
+                    <div class="tree-item folder">
+                        <span class="tree-icon">📁</span>
+                        <span class="tree-name">订单域设计</span>
+                        <span class="tree-status">6</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">订单流程设计</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">支付集成设计</span>
+                    </div>
+                    <div class="tree-item folder">
+                        <span class="tree-icon">📁</span>
+                        <span class="tree-name">商品域设计</span>
+                        <span class="tree-status">4</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">商品分类设计</span>
+                    </div>
+                    <div class="tree-item file">
+                        <span class="tree-icon">📄</span>
+                        <span class="tree-name">库存管理设计</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="content-title">湖仓建模项目文档 (12)</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="switchView('list')">📋 列表视图</button>
+                        <button class="view-btn" onclick="switchView('grid')">🎴 卡片视图</button>
+                    </div>
+                </div>
+                
+                <!-- 列表视图 -->
+                <div id="listView" class="document-list">
+                    <div class="document-item">
+                        <div class="document-header">
+                            <div class="document-title">项目需求文档</div>
+                            <div class="document-meta">
+                                <span>📅 2024-01-15</span>
+                                <span>👤 张三</span>
+                                <span>📝 草稿</span>
+                            </div>
+                        </div>
+                        <div class="document-description">
+                            湖仓建模工具的项目需求文档，包含功能需求、非功能需求、用户故事等详细内容。
+                        </div>
+                        <div class="document-tags">
+                            <span class="document-tag">需求</span>
+                            <span class="document-tag">项目</span>
+                            <span class="document-tag">重要</span>
+                        </div>
+                        <div class="document-actions">
+                            <button class="action-btn">查看</button>
+                            <button class="action-btn">编辑</button>
+                            <button class="action-btn">评论</button>
+                            <button class="action-btn primary">协作</button>
+                        </div>
+                        <div class="collaboration-status">
+                            <div class="status-dot"></div>
+                            3人在线协作
+                        </div>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="document-header">
+                            <div class="document-title">技术架构设计</div>
+                            <div class="document-meta">
+                                <span>📅 2024-01-14</span>
+                                <span>👤 李四</span>
+                                <span>✅ 已发布</span>
+                            </div>
+                        </div>
+                        <div class="document-description">
+                            系统技术架构设计文档，包含技术选型、架构图、部署方案等详细设计内容。
+                        </div>
+                        <div class="document-tags">
+                            <span class="document-tag">架构</span>
+                            <span class="document-tag">技术</span>
+                            <span class="document-tag">设计</span>
+                        </div>
+                        <div class="document-actions">
+                            <button class="action-btn">查看</button>
+                            <button class="action-btn">编辑</button>
+                            <button class="action-btn">评论</button>
+                            <button class="action-btn">版本</button>
+                        </div>
+                    </div>
+                    
+                    <div class="document-item">
+                        <div class="document-header">
+                            <div class="document-title">数据模型设计</div>
+                            <div class="document-meta">
+                                <span>📅 2024-01-13</span>
+                                <span>👤 王五</span>
+                                <span>🔄 审核中</span>
+                            </div>
+                        </div>
+                        <div class="document-description">
+                            数据模型设计文档，包含ER图、表结构设计、字段定义等详细内容。
+                        </div>
+                        <div class="document-tags">
+                            <span class="document-tag">数据</span>
+                            <span class="document-tag">模型</span>
+                            <span class="document-tag">设计</span>
+                        </div>
+                        <div class="document-actions">
+                            <button class="action-btn">查看</button>
+                            <button class="action-btn">编辑</button>
+                            <button class="action-btn">评论</button>
+                            <button class="action-btn">审核</button>
+                        </div>
+                    </div>
+                    
+                    <div class="add-document-btn">
+                        + 新建文档
+                    </div>
+                </div>
+                
+                <!-- 卡片视图 -->
+                <div id="gridView" class="document-grid" style="display: none;">
+                    <div class="document-card">
+                        <div class="document-card-header">
+                            <div class="document-card-title">项目需求文档</div>
+                            <div class="document-card-meta">
+                                <span>2024-01-15</span>
+                                <span>张三</span>
+                            </div>
+                        </div>
+                        <div class="document-card-body">
+                            <div class="document-card-description">
+                                湖仓建模工具的项目需求文档，包含功能需求、非功能需求、用户故事等详细内容。
+                            </div>
+                            <div class="document-card-tags">
+                                <span class="document-card-tag">需求</span>
+                                <span class="document-card-tag">项目</span>
+                                <span class="document-card-tag">重要</span>
+                            </div>
+                            <div class="document-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn primary">协作</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-header">
+                            <div class="document-card-title">技术架构设计</div>
+                            <div class="document-card-meta">
+                                <span>2024-01-14</span>
+                                <span>李四</span>
+                            </div>
+                        </div>
+                        <div class="document-card-body">
+                            <div class="document-card-description">
+                                系统技术架构设计文档，包含技术选型、架构图、部署方案等详细设计内容。
+                            </div>
+                            <div class="document-card-tags">
+                                <span class="document-card-tag">架构</span>
+                                <span class="document-card-tag">技术</span>
+                                <span class="document-card-tag">设计</span>
+                            </div>
+                            <div class="document-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn">版本</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-header">
+                            <div class="document-card-title">数据模型设计</div>
+                            <div class="document-card-meta">
+                                <span>2024-01-13</span>
+                                <span>王五</span>
+                            </div>
+                        </div>
+                        <div class="document-card-body">
+                            <div class="document-card-description">
+                                数据模型设计文档，包含ER图、表结构设计、字段定义等详细内容。
+                            </div>
+                            <div class="document-card-tags">
+                                <span class="document-card-tag">数据</span>
+                                <span class="document-card-tag">模型</span>
+                                <span class="document-card-tag">设计</span>
+                            </div>
+                            <div class="document-card-actions">
+                                <button class="card-action-btn">查看</button>
+                                <button class="card-action-btn">编辑</button>
+                                <button class="card-action-btn">审核</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 视图切换
+        function switchView(view) {
+            const listView = document.getElementById('listView');
+            const gridView = document.getElementById('gridView');
+            const viewBtns = document.querySelectorAll('.view-btn');
+            
+            viewBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (view === 'list') {
+                listView.style.display = 'block';
+                gridView.style.display = 'none';
+            } else {
+                listView.style.display = 'none';
+                gridView.style.display = 'grid';
+            }
+        }
+        
+        // 树形结构点击
+        document.querySelectorAll('.tree-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.classList.contains('folder')) {
+                    // 文件夹点击，切换active状态
+                    document.querySelectorAll('.tree-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                } else {
+                    // 文件点击，显示文档内容
+                    console.log('打开文档:', item.querySelector('.tree-name').textContent);
+                }
+            });
+        });
+        
+        // 文档操作按钮
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const documentTitle = btn.closest('.document-item').querySelector('.document-title').textContent;
+                
+                if (action === '查看') {
+                    console.log('查看文档:', documentTitle);
+                } else if (action === '编辑') {
+                    console.log('编辑文档:', documentTitle);
+                } else if (action === '评论') {
+                    console.log('评论文档:', documentTitle);
+                } else if (action === '协作') {
+                    console.log('协作编辑:', documentTitle);
+                } else if (action === '审核') {
+                    console.log('审核文档:', documentTitle);
+                } else if (action === '版本') {
+                    console.log('查看版本:', documentTitle);
+                }
+            });
+        });
+        
+        // 卡片操作按钮
+        document.querySelectorAll('.card-action-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.textContent;
+                const documentTitle = btn.closest('.document-card').querySelector('.document-card-title').textContent;
+                
+                if (action === '查看') {
+                    console.log('查看文档:', documentTitle);
+                } else if (action === '编辑') {
+                    console.log('编辑文档:', documentTitle);
+                } else if (action === '协作') {
+                    console.log('协作编辑:', documentTitle);
+                } else if (action === '版本') {
+                    console.log('查看版本:', documentTitle);
+                }
+            });
+        });
+        
+        // 搜索功能
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.document-item');
+            
+            items.forEach(item => {
+                const title = item.querySelector('.document-title').textContent.toLowerCase();
+                const description = item.querySelector('.document-description').textContent.toLowerCase();
+                const tags = Array.from(item.querySelectorAll('.document-tag')).map(tag => tag.textContent.toLowerCase());
+                
+                const matches = title.includes(searchTerm) || 
+                              description.includes(searchTerm) || 
+                              tags.some(tag => tag.includes(searchTerm));
+                
+                item.style.display = matches ? '' : 'none';
+            });
+        });
+        
+        // 新建文档按钮
+        document.querySelector('.toolbar-btn.primary').addEventListener('click', () => {
+            console.log('新建文档');
+            // 这里可以打开新建文档的弹窗
+        });
+        
+        document.querySelector('.add-document-btn').addEventListener('click', () => {
+            console.log('新建文档');
+            // 这里可以打开新建文档的弹窗
+        });
+    </script>
+</body>
+</html>

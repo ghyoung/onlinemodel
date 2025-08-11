@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDL导入 - 湖仓建模工具</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 24px;
+        }
+        
+        .import-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .steps-container {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+            margin-bottom: 24px;
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #e8e8e8;
+            z-index: 1;
+        }
+        
+        .step.active:not(:last-child)::after {
+            background: #1890ff;
+        }
+        
+        .step.completed:not(:last-child)::after {
+            background: #52c41a;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            color: #8c8c8c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step.active .step-number {
+            background: #1890ff;
+            color: #fff;
+        }
+        
+        .step.completed .step-number {
+            background: #52c41a;
+            color: #fff;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: #8c8c8c;
+            text-align: center;
+        }
+        
+        .step.active .step-label {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .step.completed .step-label {
+            color: #52c41a;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .file-upload {
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .file-upload:hover {
+            border-color: #1890ff;
+            background: #f0f8ff;
+        }
+        
+        .file-upload.dragover {
+            border-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #8c8c8c;
+            margin-bottom: 16px;
+        }
+        
+        .upload-text {
+            color: #595959;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .upload-hint {
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+        
+        .connection-test {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .test-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        
+        .status-success {
+            color: #52c41a;
+        }
+        
+        .status-error {
+            color: #f5222d;
+        }
+        
+        .table-list {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #fafafa;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .table-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .table-item:last-child {
+            border-bottom: none;
+        }
+        
+        .table-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .table-info {
+            flex: 1;
+        }
+        
+        .table-name {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .table-details {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .table-count {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .import-options {
+            background: #fafafa;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+        
+        .option-group {
+            margin-bottom: 16px;
+        }
+        
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #262626;
+        }
+        
+        .option-checkbox {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .progress-container {
+            margin-top: 24px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #1890ff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn.primary {
+            background: #1890ff;
+            color: #fff;
+            border-color: #1890ff;
+        }
+        
+        .btn.primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result-summary {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+        
+        .result-title {
+            color: #52c41a;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .result-stat {
+            text-align: center;
+        }
+        
+        .result-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #52c41a;
+            margin-bottom: 4px;
+        }
+        
+        .result-label {
+            font-size: 12px;
+            color: #595959;
+        }
+    </style>
+</head>
+<body>
+    <div class="import-container">
+        <div class="page-header">
+            <h1 class="page-title">DDL导入</h1>
+            <p class="page-subtitle">支持快速导入现有数仓的DDL语句，自动解析表结构</p>
+        </div>
+        
+        <div class="steps-container">
+            <div class="steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">连接配置</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">表选择</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">导入配置</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">执行导入</div>
+                </div>
+            </div>
+            
+            <!-- 步骤1: 连接配置 -->
+            <div class="step-content active" data-step="1">
+                <h3 style="margin-bottom: 24px; color: #262626;">数据库连接配置</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">数据库类型</label>
+                    <select class="form-select">
+                        <option value="mysql">MySQL</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="oracle">Oracle</option>
+                        <option value="sqlserver">SQL Server</option>
+                        <option value="hive">Hive</option>
+                        <option value="clickhouse">ClickHouse</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">连接名称</label>
+                    <input type="text" class="form-input" placeholder="输入连接名称，如：生产环境MySQL">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">主机地址</label>
+                    <input type="text" class="form-input" placeholder="localhost 或 IP地址">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">端口</label>
+                    <input type="text" class="form-input" placeholder="3306">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">数据库名</label>
+                    <input type="text" class="form-input" placeholder="数据库名称">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">用户名</label>
+                    <input type="text" class="form-input" placeholder="数据库用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input type="password" class="form-input" placeholder="数据库密码">
+                </div>
+                
+                <div class="connection-test">
+                    <button class="test-btn" onclick="testConnection()">🔍 测试连接</button>
+                    <div class="test-status status-success">
+                        ✅ 连接成功
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <div></div>
+                    <button class="btn primary" onclick="nextStep()">下一步</button>
+                </div>
+            </div>
+            
+            <!-- 步骤2: 表选择 -->
+            <div class="step-content" data-step="2">
+                <h3 style="margin-bottom: 24px; color: #262626;">选择要导入的表</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">搜索表名</label>
+                    <input type="text" class="form-input" placeholder="输入表名关键词进行搜索...">
+                </div>
+                
+                <div class="table-list">
+                    <div class="table-header">
+                        可导入的表 (共 24 张表)
+                    </div>
+                    
+                    <div class="table-item">
+                        <input type="checkbox" class="table-checkbox" checked>
+                        <div class="table-info">
+                            <div class="table-name">user_profile</div>
+                            <div class="table-details">用户档案信息表 • 8个字段</div>
+                        </div>
+                        <div class="table-count">8</div>
+                    </div>
+                    
+                    <div class="table-item">
+                        <input type="checkbox" class="table-checkbox" checked>
+                        <div class="table-info">
+                            <div class="table-name">order_info</div>
+                            <div class="table-details">订单信息表 • 12个字段</div>
+                        </div>
+                        <div class="table-count">12</div>
+                    </div>
+                    
+                    <div class="table-item">
+                        <input type="checkbox" class="table-checkbox">
+                        <div class="table-info">
+                            <div class="table-name">product_info</div>
+                            <div class="table-details">产品信息表 • 15个字段</div>
+                        </div>
+                        <div class="table-count">15</div>
+                    </div>
+                    
+                    <div class="table-item">
+                        <input type="checkbox" class="table-checkbox">
+                        <div class="table-info">
+                            <div class="table-name">payment_record</div>
+                            <div class="table-details">支付记录表 • 10个字段</div>
+                        </div>
+                        <div class="table-count">10</div>
+                    </div>
+                    
+                    <div class="table-item">
+                        <input type="checkbox" class="table-checkbox">
+                        <div class="table-info">
+                            <div class="table-name">log_analysis</div>
+                            <div class="table-details">日志分析表 • 20个字段</div>
+                        </div>
+                        <div class="table-count">20</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn" onclick="prevStep()">上一步</button>
+                    <button class="btn primary" onclick="nextStep()">下一步</button>
+                </div>
+            </div>
+            
+            <!-- 步骤3: 导入配置 -->
+            <div class="step-content" data-step="3">
+                <h3 style="margin-bottom: 24px; color: #262626;">导入配置选项</h3>
+                
+                <div class="import-options">
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            自动创建表关系
+                        </label>
+                        <div style="font-size: 12px; color: #8c8c8c; margin-left: 24px;">
+                            根据外键约束自动创建表之间的血缘关系
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            导入字段注释
+                        </label>
+                        <div style="font-size: 12px; color: #8c8c8c; margin-left: 24px;">
+                            导入数据库中的字段注释作为字段描述
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            导入索引信息
+                        </label>
+                        <div style="font-size: 12px; color: #8c8c8c; margin-left: 24px;">
+                            导入主键、唯一索引、普通索引等索引信息
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="checkbox" class="option-checkbox">
+                            导入分区信息
+                        </label>
+                        <div style="font-size: 12px; color: #8c8c8c; margin-left: 24px;">
+                            导入表的分区策略和分区信息
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="checkbox" class="option-checkbox" checked>
+                            覆盖已存在的表
+                        </label>
+                        <div style="font-size: 12px; color: #8c8c8c; margin-left: 24px;">
+                            如果表已存在，则覆盖现有表结构
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn" onclick="prevStep()">上一步</button>
+                    <button class="btn primary" onclick="nextStep()">开始导入</button>
+                </div>
+            </div>
+            
+            <!-- 步骤4: 执行导入 -->
+            <div class="step-content" data-step="4">
+                <h3 style="margin-bottom: 24px; color: #262626;">执行导入</h3>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">准备导入...</div>
+                </div>
+                
+                <div class="result-summary" id="resultSummary" style="display: none;">
+                    <div class="result-title">
+                        ✅ 导入完成
+                    </div>
+                    <div>成功导入 2 张表，共 20 个字段</div>
+                    
+                    <div class="result-stats">
+                        <div class="result-stat">
+                            <div class="result-number">2</div>
+                            <div class="result-label">成功导入表</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-number">20</div>
+                            <div class="result-label">字段总数</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-number">3</div>
+                            <div class="result-label">表关系</div>
+                        </div>
+                        <div class="result-stat">
+                            <div class="result-number">5</div>
+                            <div class="result-label">索引</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn" onclick="prevStep()">上一步</button>
+                    <button class="btn primary" onclick="finishImport()" id="finishBtn" style="display: none;">完成</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 1;
+        
+        function nextStep() {
+            if (currentStep < 4) {
+                currentStep++;
+                updateSteps();
+                if (currentStep === 4) {
+                    startImport();
+                }
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateSteps();
+            }
+        }
+        
+        function updateSteps() {
+            // 更新步骤状态
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNum = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // 更新步骤内容
+            document.querySelectorAll('.step-content').forEach((content, index) => {
+                const stepNum = index + 1;
+                content.classList.remove('active');
+                
+                if (stepNum === currentStep) {
+                    content.classList.add('active');
+                }
+            });
+        }
+        
+        function testConnection() {
+            // 模拟连接测试
+            const testStatus = document.querySelector('.test-status');
+            testStatus.className = 'test-status status-error';
+            testStatus.innerHTML = '❌ 连接失败';
+            
+            setTimeout(() => {
+                testStatus.className = 'test-status status-success';
+                testStatus.innerHTML = '✅ 连接成功';
+            }, 2000);
+        }
+        
+        function startImport() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const resultSummary = document.getElementById('resultSummary');
+            const finishBtn = document.getElementById('finishBtn');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    progressText.textContent = '导入完成！';
+                    resultSummary.style.display = 'block';
+                    finishBtn.style.display = 'block';
+                }
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `正在导入... ${Math.round(progress)}%`;
+            }, 500);
+        }
+        
+        function finishImport() {
+            // 跳转到模型管理页面
+            if (parent && parent.loadPage) {
+                parent.loadPage('model-management', '模型管理');
+            }
+        }
+        
+        // 文件拖拽上传
+        const fileUpload = document.querySelector('.file-upload');
+        
+        fileUpload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        });
+        
+        fileUpload.addEventListener('dragleave', () => {
+            fileUpload.classList.remove('dragover');
+        });
+        
+        fileUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            // 处理文件上传
+        });
+    </script>
+</body>
+</html>

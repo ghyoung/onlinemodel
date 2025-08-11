@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>湖仓建模工具 - 原型演示</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .prototype-container {
+            display: flex;
+            height: 100vh;
+            background-color: #fff;
+        }
+        
+        .sidebar {
+            width: 200px;
+            min-width: 80px;
+            background-color: #001529; /* Ant Design 暗色侧边栏 */
+            color: rgba(255,255,255,0.85);
+            overflow-y: auto;
+            transition: width 0.2s;
+            position: relative;
+            /* Ant 默认无明显右边框 */
+        }
+        .sidebar.collapsed {
+            width: 80px;
+        }
+        .sidebar-header {
+            height: 64px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar.collapsed .sidebar-header h1,
+        .sidebar.collapsed .sidebar-header p {
+            display: none;
+        }
+        .sidebar-header .logo-mark {
+            width: 32px; height: 32px; border-radius: 6px; background: #1677ff; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;
+        }
+        .sidebar-header h1 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .sidebar-header p {
+            color: rgba(255,255,255,0.45);
+            font-size: 12px;
+            margin: 0;
+        }
+        .menu-tree {
+            padding: 8px 8px 56px; /* 为底部触发器留出空间 */
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            height: 48px; /* Ant 行高 */
+            padding: 0 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+            margin: 4px 8px;
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+        }
+        .menu-item:hover {
+            background-color: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .menu-item.active {
+            background-color: #1677ff; /* Ant v5 主色 */
+            color: #fff;
+        }
+        .menu-item .icon {
+            min-width: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: rgba(255,255,255,0.65);
+        }
+        .menu-item .icon .iconify { font-size: 18px; color: rgba(255,255,255,0.65); }
+        .menu-item.active .icon .iconify { color: #fff; }
+        .menu-item .label {
+            flex: 1;
+            white-space: nowrap;
+        }
+        .submenu-arrow {
+            margin-left: 8px;
+            color: rgba(255,255,255,0.45);
+            font-size: 12px;
+            transition: transform 0.2s;
+            display: inline-flex; align-items: center;
+        }
+        .submenu-arrow .iconify { font-size: 14px; color: rgba(255,255,255,0.45); }
+        .has-submenu.open > .submenu-arrow { transform: rotate(90deg); }
+
+        .sidebar.collapsed .menu-item .label,
+        .sidebar.collapsed .menu-item .submenu-arrow {
+            display: none;
+        }
+
+        .submenu {
+            margin: 4px 0 8px;
+        }
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            height: 40px;
+            padding: 0 16px 0 44px; /* 缩进对齐 */
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 6px;
+            margin: 2px 8px;
+            color: rgba(255,255,255,0.65);
+            font-size: 14px;
+        }
+        .submenu-item:hover {
+            background-color: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .submenu-item.active {
+            background-color: #1677ff;
+            color: #fff;
+        }
+        .sidebar.collapsed .submenu { display: none !important; }
+
+        /* 简约统一图标占位（非 emoji） */
+        /* 去除 simple-icon，改用 ant-design 图标 */
+
+        /* 底部触发器（Ant Sider Trigger风格） */
+        .sider-trigger {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 48px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .breadcrumb { font-size: 12px; color: #8c8c8c; margin-left: 16px; }
+        .top-bar {
+            height: 64px;
+            background-color: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .top-bar h2 {
+            color: #262626;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .content-area { flex: 1; padding: 24px; overflow-y: auto; }
+        .iframe-container { width: 100%; height: 100%; border: none; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+        /* 顶部用户信息（Ant Dropdown 风格） */
+        .topbar-user { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative; cursor: pointer; padding: 4px 8px; border-radius: 6px; }
+        .topbar-user:hover { background: #f5f5f5; }
+        .topbar-user .avatar { width: 32px; height: 32px; border-radius: 50%; background: #1677ff; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .topbar-user .name { color: #262626; font-size: 14px; font-weight: 500; }
+        .topbar-user .arrow .iconify { font-size: 14px; color: #8c8c8c; transition: transform 0.2s; }
+        .topbar-user.open .arrow .iconify { transform: rotate(180deg); }
+        .user-dropdown { display: none; position: absolute; top: 48px; right: 0; background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; min-width: 180px; box-shadow: 0 6px 16px rgba(0,0,0,0.08); padding: 4px; z-index: 100; }
+        .user-dropdown .dropdown-item { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; color: #262626; border-radius: 6px; }
+        .user-dropdown .dropdown-item:hover { background: #f5f5f5; }
+        .user-dropdown .dropdown-item .iconify { font-size: 16px; color: #8c8c8c; }
+        .user-dropdown .dropdown-divider { height: 1px; margin: 4px 0; background: #f0f0f0; }
+
+        /* 其余样式保持 */
+        .welcome-content { text-align: center; padding: 60px 20px; }
+        .welcome-content h1 { font-size: 32px; color: #262626; margin-bottom: 16px; }
+        .welcome-content p { font-size: 16px; color: #595959; margin-bottom: 32px; line-height: 1.6; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 40px; }
+        .feature-card { background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #f0f0f0; text-align: left; cursor: pointer; transition: all 0.3s; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .feature-card h3 { color: #1677ff; font-size: 18px; margin-bottom: 12px; }
+        .feature-card p { color: #595959; font-size: 14px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-mark">HC</div>
+                <h1>湖仓建模工具</h1>
+                <p>原型演示系统</p>
+            </div>
+            <div class="menu-tree">
+                <div class="menu-item active" onclick="loadPage('dashboard', '仪表盘')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:dashboard-outlined"></span></span>
+                    <span class="label">首页</span>
+                </div>
+
+                <div class="menu-item has-submenu" id="menu-modeling">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:appstore-outlined"></span></span>
+                    <span class="label">数据建模</span>
+                    <span class="submenu-arrow"><span class="iconify" data-icon="ant-design:right-outlined"></span></span>
+                </div>
+                <div class="submenu" id="submenu-modeling" style="display:none;">
+                    <div class="submenu-item" onclick="loadPage('model-management', '模型管理')">
+                        <span class="icon"><span class="iconify" data-icon="ant-design:profile-outlined"></span></span>
+                        <span class="label">模型管理</span>
+                    </div>
+                </div>
+
+                <div class="menu-item" onclick="loadPage('lineage', '血缘关系')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:share-alt-outlined"></span></span>
+                    <span class="label">血缘关系</span>
+                </div>
+
+                <div class="menu-item" onclick="loadPage('field-library', '标准字段库')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:book-outlined"></span></span>
+                    <span class="label">标准字段库</span>
+                </div>
+
+                <div class="menu-item" onclick="loadPage('data-governance', '数据治理')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:safety-outlined"></span></span>
+                    <span class="label">数据治理</span>
+                </div>
+
+                <div class="menu-item" onclick="loadPage('document-management', '文档管理')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:file-text-outlined"></span></span>
+                    <span class="label">文档管理</span>
+                </div>
+
+                <div class="menu-item" onclick="loadPage('system-settings', '系统设置')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:setting-outlined"></span></span>
+                    <span class="label">系统设置</span>
+                </div>
+            </div>
+            <div class="sider-trigger" id="siderTrigger"><span class="iconify" data-icon="ant-design:menu-fold-outlined"></span></div>
+        </div>
+        
+        <div class="main-content">
+            <div class="top-bar">
+                <h2 id="page-title">欢迎使用湖仓建模工具</h2>
+                <div class="breadcrumb" id="breadcrumb">首页</div>
+                <div class="global-search" style="margin-left:32px;flex:1;max-width:400px;">
+                    <input type="text" id="globalSearchInput" placeholder="全局搜索模型、表、字段、文档..." style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;" onkeydown="if(event.key==='Enter'){doGlobalSearch();}">
+                </div>
+                <div class="topbar-user" id="topbarUser">
+                    <div class="avatar">U</div>
+                    <span class="name">用户名</span>
+                    <span class="arrow"><span class="iconify" data-icon="ant-design:down-outlined"></span></span>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-item" onclick="openSecurity(event)"><span class="iconify" data-icon="ant-design:safety-certificate-outlined"></span><span>安全设置</span></div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item" onclick="logout()"><span class="iconify" data-icon="ant-design:logout-outlined"></span><span>退出登录</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div id="welcome-content" class="welcome-content">
+                    <h1>欢迎使用湖仓建模工具</h1>
+                    <p>这是一个高保真原型演示系统，展示了湖仓建模工具的主要功能和界面设计。</p>
+                    <p>请从左侧菜单选择要查看的功能模块，或直接点击下方功能卡片快速体验。</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card" onclick="loadPage('model-management', '模型管理')">
+                            <h3>📋 模型管理</h3>
+                            <p>管理已创建的模型和表结构，支持版本管理、导出、在线建模、DDL导入等操作。</p>
+                        </div>
+                        <div class="feature-card" onclick="loadPage('lineage', '血缘关系')">
+                            <h3>🔄 血缘关系</h3>
+                            <p>可视化展示模型血缘关系，支持血缘深度控制，血缘路径追踪等功能。</p>
+                        </div>
+                        <div class="feature-card" onclick="loadPage('field-library', '标准字段库')">
+                            <h3>📚 标准字段库</h3>
+                            <p>维护标准化的字段定义库，支持字段分类、搜索、推荐等功能。</p>
+                        </div>
+                        <div class="feature-card" onclick="loadPage('data-governance', '数据治理')">
+                            <h3>🛡️ 数据治理</h3>
+                            <p>提供智能化的数据治理能力，包括质量检测、规则配置、治理报告等。</p>
+                        </div>
+                        <div class="feature-card" onclick="loadPage('document-management', '文档管理')">
+                            <h3>📝 文档管理</h3>
+                            <p>管理建模文档和协作，支持版本历史、协作状态、评论系统等。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <iframe id="page-iframe" class="iframe-container" style="display: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadPage(page, title) {
+            document.getElementById('page-title').textContent = title;
+            const map = {
+                'dashboard': '首页',
+                'online-modeling': '数据建模 / 在线建模',
+                'ddl-import': '数据建模 / DDL导入',
+                'model-management': '数据建模 / 模型管理',
+                'lineage': '血缘关系',
+                'field-library': '标准字段库',
+                'data-governance': '数据治理',
+                'document-management': '文档管理',
+                'system-settings': '系统设置',
+                'security-settings': '安全设置'
+            };
+            document.getElementById('breadcrumb').textContent = `首页 / ${map[page] || title}`;
+            document.getElementById('welcome-content').style.display = 'none';
+            const iframe = document.getElementById('page-iframe');
+            iframe.style.display = 'block';
+            iframe.src = page + '.html';
+            updateMenuState(page);
+        }
+        
+        function updateMenuState(activePage) {
+            document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelector(`[onclick*="${activePage}"]`);
+            if (activeItem) { activeItem.classList.add('active'); }
+        }
+        
+        // 初始化首页为dashboard
+        updateMenuState('dashboard');
+        document.getElementById('breadcrumb').textContent = '首页';
+        document.getElementById('welcome-content').style.display = 'none';
+        const iframe = document.getElementById('page-iframe');
+        iframe.style.display = 'block';
+        iframe.src = 'dashboard.html';
+
+        // 顶部用户信息下拉菜单逻辑
+        const topbarUser = document.getElementById('topbarUser');
+        const userDropdown = document.getElementById('userDropdown');
+        let userMenuOpen = false;
+        topbarUser.onclick = function(e) {
+            e.stopPropagation();
+            userMenuOpen = !userMenuOpen;
+            userDropdown.style.display = userMenuOpen ? 'block' : 'none';
+            topbarUser.classList.toggle('open', userMenuOpen);
+        };
+        document.body.addEventListener('click', function() {
+            userDropdown.style.display = 'none';
+            userMenuOpen = false;
+            topbarUser.classList.remove('open');
+        });
+        function openSecurity(e) { e.stopPropagation(); userDropdown.style.display = 'none'; userMenuOpen = false; topbarUser.classList.remove('open'); loadPage('security-settings', '安全设置'); }
+        function logout() { window.location.href = 'login.html'; }
+
+        // 左侧导航栏收缩/展开（底部触发器）
+        const sidebar = document.getElementById('sidebar');
+        const siderTrigger = document.getElementById('siderTrigger');
+        let collapsed = false;
+        function renderTrigger() {
+            siderTrigger.innerHTML = collapsed 
+                ? '<span class="iconify" data-icon="ant-design:menu-unfold-outlined"></span>' 
+                : '<span class="iconify" data-icon="ant-design:menu-fold-outlined"></span>';
+        }
+        siderTrigger.onclick = function() {
+            collapsed = !collapsed;
+            sidebar.classList.toggle('collapsed', collapsed);
+            if (collapsed) {
+                document.getElementById('submenu-modeling').style.display = 'none';
+                document.getElementById('menu-modeling').classList.remove('open');
+            }
+            renderTrigger();
+        };
+        renderTrigger();
+
+        // 二级菜单展开/收起
+        const modelingMenu = document.getElementById('menu-modeling');
+        const modelingSubmenu = document.getElementById('submenu-modeling');
+        modelingMenu.onclick = function() {
+            if (collapsed) return;
+            const isOpen = modelingMenu.classList.toggle('open');
+            modelingSubmenu.style.display = isOpen ? 'block' : 'none';
+        };
+
+        function doGlobalSearch() {
+            const val = document.getElementById('globalSearchInput').value.trim();
+            if(val) {
+                alert('全局搜索功能原型：' + val + '\n（此处可弹出全局搜索结果面板，支持模型、表、字段、文档等分组展示）');
+            }
+        }
+    </script>
+</body>
+</html>
