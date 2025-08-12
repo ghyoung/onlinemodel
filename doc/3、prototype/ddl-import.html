@@ -23,21 +23,7 @@
             margin: 0 auto;
         }
         
-        .page-header {
-            margin-bottom: 24px;
-        }
-        
-        .page-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #262626;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            color: #8c8c8c;
-            font-size: 14px;
-        }
+
         
         .steps-container {
             background: #fff;
@@ -220,42 +206,7 @@
             font-size: 14px;
         }
         
-        .connection-test {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        
-        .test-btn {
-            padding: 8px 16px;
-            border: 1px solid #d9d9d9;
-            border-radius: 6px;
-            background: #fff;
-            color: #595959;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .test-btn:hover {
-            border-color: #1890ff;
-            color: #1890ff;
-        }
-        
-        .test-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-        }
-        
-        .status-success {
-            color: #52c41a;
-        }
-        
-        .status-error {
-            color: #f5222d;
-        }
+
         
         .table-list {
             border: 1px solid #e8e8e8;
@@ -392,6 +343,21 @@
             border-color: #40a9ff;
         }
         
+        .btn.primary.selected {
+            background: #52c41a;
+            border-color: #52c41a;
+        }
+        
+        .btn.primary.selected:hover {
+            background: #52c41a;
+            border-color: #52c41a;
+        }
+        
+        .btn.primary.selected:hover {
+            background: #52c41a;
+            border-color: #52c41a;
+        }
+        
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -436,20 +402,83 @@
             font-size: 12px;
             color: #595959;
         }
+        
+        .data-source-list {
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .data-source-item {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .data-source-item:last-child {
+            border-bottom: none;
+        }
+        
+        .data-source-item:hover {
+            background-color: #fafafa;
+        }
+        
+        .data-source-info {
+            flex: 1;
+        }
+        
+        .data-source-name {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .data-source-details {
+            font-size: 12px;
+            color: #8c8c8c;
+        }
+        
+        .data-source-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #52c41a;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.success {
+            background: #52c41a;
+        }
+        
+        .status-dot.warning {
+            background: #faad14;
+        }
+        
+        .status-dot.error {
+            background: #f5222d;
+        }
+        
+
     </style>
 </head>
 <body>
     <div class="import-container">
-        <div class="page-header">
-            <h1 class="page-title">DDL导入</h1>
-            <p class="page-subtitle">支持快速导入现有数仓的DDL语句，自动解析表结构</p>
-        </div>
+
         
         <div class="steps-container">
             <div class="steps">
                 <div class="step active" data-step="1">
                     <div class="step-number">1</div>
-                    <div class="step-label">连接配置</div>
+                    <div class="step-label">数据源选择</div>
                 </div>
                 <div class="step" data-step="2">
                     <div class="step-number">2</div>
@@ -465,61 +494,52 @@
                 </div>
             </div>
             
-            <!-- 步骤1: 连接配置 -->
+            <!-- 步骤1: 数据源选择 -->
             <div class="step-content active" data-step="1">
-                <h3 style="margin-bottom: 24px; color: #262626;">数据库连接配置</h3>
+                <h3 style="margin-bottom: 24px; color: #262626;">选择数据源</h3>
                 
                 <div class="form-group">
-                    <label class="form-label">数据库类型</label>
-                    <select class="form-select">
-                        <option value="mysql">MySQL</option>
-                        <option value="postgresql">PostgreSQL</option>
-                        <option value="oracle">Oracle</option>
-                        <option value="sqlserver">SQL Server</option>
-                        <option value="hive">Hive</option>
-                        <option value="clickhouse">ClickHouse</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">连接名称</label>
-                    <input type="text" class="form-input" placeholder="输入连接名称，如：生产环境MySQL">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">主机地址</label>
-                    <input type="text" class="form-input" placeholder="localhost 或 IP地址">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">端口</label>
-                    <input type="text" class="form-input" placeholder="3306">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">数据库名</label>
-                    <input type="text" class="form-input" placeholder="数据库名称">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">用户名</label>
-                    <input type="text" class="form-input" placeholder="数据库用户名">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">密码</label>
-                    <input type="password" class="form-input" placeholder="数据库密码">
-                </div>
-                
-                <div class="connection-test">
-                    <button class="test-btn" onclick="testConnection()">🔍 测试连接</button>
-                    <div class="test-status status-success">
-                        ✅ 连接成功
+                    <label class="form-label">已配置的数据源</label>
+                    <div class="data-source-list">
+                        <div class="data-source-item">
+                            <div class="data-source-info">
+                                <div class="data-source-name">用户中心数据库 (MySQL)</div>
+                                <div class="data-source-details">192.168.1.100:3306/user_center</div>
+                            </div>
+                            <div class="data-source-status">
+                                <span class="status-dot success"></span>
+                                连接正常
+                            </div>
+                            <button class="btn primary" onclick="selectDataSource('user_center')">选择</button>
+                        </div>
+                        
+                        <div class="data-source-item">
+                            <div class="data-source-info">
+                                <div class="data-source-name">订单系统数据库 (PostgreSQL)</div>
+                                <div class="data-source-details">192.168.1.101:5432/order_system</div>
+                            </div>
+                            <div class="data-source-status">
+                                <span class="status-dot success"></span>
+                                连接正常
+                            </div>
+                            <button class="btn primary" onclick="selectDataSource('order_system')">选择</button>
+                        </div>
+                        
+                        <div class="data-source-item">
+                            <div class="data-source-info">
+                                <div class="data-source-name">商品数据仓库 (Hive)</div>
+                                <div class="data-source-details">hive-server:10000/product_warehouse</div>
+                            </div>
+                            <div class="data-source-status">
+                                <span class="status-dot warning"></span>
+                                连接缓慢
+                            </div>
+                            <button class="btn primary" onclick="selectDataSource('product_warehouse')">选择</button>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="action-buttons">
-                    <div></div>
                     <button class="btn primary" onclick="nextStep()">下一步</button>
                 </div>
             </div>
@@ -741,17 +761,7 @@
             });
         }
         
-        function testConnection() {
-            // 模拟连接测试
-            const testStatus = document.querySelector('.test-status');
-            testStatus.className = 'test-status status-error';
-            testStatus.innerHTML = '❌ 连接失败';
-            
-            setTimeout(() => {
-                testStatus.className = 'test-status status-success';
-                testStatus.innerHTML = '✅ 连接成功';
-            }, 2000);
-        }
+
         
         function startImport() {
             const progressFill = document.getElementById('progressFill');
@@ -781,6 +791,25 @@
             if (parent && parent.loadPage) {
                 parent.loadPage('model-management', '模型管理');
             }
+        }
+        
+        function selectDataSource(dataSourceId) {
+            // 处理数据源选择
+            console.log('选择数据源:', dataSourceId);
+            
+            // 更新数据源选择状态
+            document.querySelectorAll('.data-source-item button').forEach(btn => {
+                btn.textContent = '选择';
+                btn.classList.remove('selected');
+            });
+            
+            event.target.textContent = '已选择';
+            event.target.classList.add('selected');
+            
+            // 自动进入下一步
+            setTimeout(() => {
+                nextStep();
+            }, 500);
         }
         
         // 文件拖拽上传

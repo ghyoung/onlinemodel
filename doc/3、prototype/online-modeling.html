@@ -23,6 +23,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         .toolbar {
@@ -153,26 +154,29 @@
             padding: 16px 24px;
             border-bottom: 1px solid #e8e8e8;
             background: #fafafa;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         
         .header-left {
-            flex: 1;
-        }
-        
-        .header-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
+            width: 100%;
         }
         
         .table-props {
             display: flex;
             gap: 16px;
             font-size: 14px;
+        }
+        
+        .table-props-row {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 12px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .table-prop-item {
+            display: flex;
+            align-items: center;
         }
         
         .table-props label {
@@ -193,6 +197,8 @@
         .autosave-hint {
             color: #8c8c8c;
             font-size: 12px;
+            margin-top: 8px;
+            padding-left: 0;
         }
         
         .table-title {
@@ -222,6 +228,9 @@
             border-radius: 4px;
             transition: background-color 0.2s;
             margin-top: 4px;
+            line-height: 1.5;
+            white-space: pre-line;
+            min-height: 20px;
         }
         
         .table-description:hover {
@@ -381,11 +390,6 @@
             background: #f5f5f5;
         }
         
-        .tab-content {
-            flex: 1;
-            overflow: hidden;
-        }
-        
         .tab-pane {
             display: none;
             height: 100%;
@@ -460,14 +464,18 @@
             padding: 24px;
             overflow: auto;
             position: relative;
+            max-width: 100%;
+            /* 确保横向滚动条可见 */
+            overflow-x: auto;
+            overflow-y: auto;
         }
         
         .table-container {
             border: 1px solid #e8e8e8;
             border-radius: 8px;
-            overflow: hidden;
+            overflow: visible;
             width: 100%;
-            min-width: 2000px; /* 设置最小宽度确保横向滚动 */
+            min-width: 1790px; /* 根据实际列宽计算的总宽度 */
             position: relative;
         }
         
@@ -494,7 +502,7 @@
             display: flex;
             background: #fafafa;
             border-bottom: 1px solid #e8e8e8;
-            min-width: 2000px; /* 与容器保持一致 */
+            min-width: 1790px; /* 与容器保持一致 */
             position: sticky;
             top: 0;
             z-index: 10;
@@ -503,7 +511,7 @@
         .table-row {
             display: flex;
             border-bottom: 1px solid #f0f0f0;
-            min-width: 2000px; /* 与容器保持一致 */
+            min-width: 1790px; /* 与容器保持一致 */
             transition: background-color 0.2s;
             cursor: pointer;
         }
@@ -558,23 +566,23 @@
             background: #f0f8ff;
         }
         
-        /* 确保每列的宽度一致 */
-        .table-header-cell:nth-child(1), .table-cell:nth-child(1) { min-width: 120px; }
-        .table-header-cell:nth-child(2), .table-cell:nth-child(2) { min-width: 120px; }
-        .table-header-cell:nth-child(3), .table-cell:nth-child(3) { min-width: 100px; }
-        .table-header-cell:nth-child(4), .table-cell:nth-child(4) { min-width: 100px; }
-        .table-header-cell:nth-child(5), .table-cell:nth-child(5) { min-width: 80px; }
-        .table-header-cell:nth-child(6), .table-cell:nth-child(6) { min-width: 80px; }
-        .table-header-cell:nth-child(7), .table-cell:nth-child(7) { min-width: 100px; }
-        .table-header-cell:nth-child(8), .table-cell:nth-child(8) { min-width: 80px; }
-        .table-header-cell:nth-child(9), .table-cell:nth-child(9) { min-width: 120px; }
-        .table-header-cell:nth-child(10), .table-cell:nth-child(10) { min-width: 200px; }
-        .table-header-cell:nth-child(11), .table-cell:nth-child(11) { min-width: 120px; }
-        .table-header-cell:nth-child(12), .table-cell:nth-child(12) { min-width: 120px; }
-        .table-header-cell:nth-child(13), .table-cell:nth-child(13) { min-width: 120px; }
-        .table-header-cell:nth-child(14), .table-cell:nth-child(14) { min-width: 120px; }
-        .table-header-cell:nth-child(15), .table-cell:nth-child(15) { min-width: 150px; }
-        .table-header-cell:nth-child(16), .table-cell:nth-child(16) { min-width: 100px; }
+        /* 确保每列的宽度一致，支持横向滚动 */
+        .table-header-cell:nth-child(1), .table-cell:nth-child(1) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(2), .table-cell:nth-child(2) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(3), .table-cell:nth-child(3) { width: 100px; min-width: 100px; flex-shrink: 0; }
+        .table-header-cell:nth-child(4), .table-cell:nth-child(4) { width: 100px; min-width: 100px; flex-shrink: 0; }
+        .table-header-cell:nth-child(5), .table-cell:nth-child(5) { width: 80px; min-width: 80px; flex-shrink: 0; }
+        .table-header-cell:nth-child(6), .table-cell:nth-child(6) { width: 80px; min-width: 80px; flex-shrink: 0; }
+        .table-header-cell:nth-child(7), .table-cell:nth-child(7) { width: 100px; min-width: 100px; flex-shrink: 0; }
+        .table-header-cell:nth-child(8), .table-cell:nth-child(8) { width: 80px; min-width: 80px; flex-shrink: 0; }
+        .table-header-cell:nth-child(9), .table-cell:nth-child(9) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(10), .table-cell:nth-child(10) { width: 200px; min-width: 200px; flex-shrink: 0; }
+        .table-header-cell:nth-child(11), .table-cell:nth-child(11) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(12), .table-cell:nth-child(12) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(13), .table-cell:nth-child(13) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(14), .table-cell:nth-child(14) { width: 120px; min-width: 120px; flex-shrink: 0; }
+        .table-header-cell:nth-child(15), .table-cell:nth-child(15) { width: 150px; min-width: 150px; flex-shrink: 0; }
+        .table-header-cell:nth-child(16), .table-cell:nth-child(16) { width: 100px; min-width: 100px; flex-shrink: 0; }
         
         .cell-input {
             border: none;
@@ -752,6 +760,122 @@
             display: none; /* 暂不展示在线协作用户 */
         }
         
+        /* 更多按钮下拉菜单样式 */
+        .more-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 180px;
+            display: none;
+        }
+        
+        .more-dropdown.visible {
+            display: block;
+        }
+        
+        .more-menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #262626;
+        }
+        
+        .more-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .more-menu-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .more-menu-item.active {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .toolbar-btn {
+            position: relative;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            backdrop-filter: blur(2px);
+        }
+        
+        .modal.visible {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+            max-width: 90vw;
+            max-height: 90vh;
+            width: 1200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #8c8c8c;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: #262626;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow: auto;
+            padding: 0;
+        }
+        
         .user-avatar {
             width: 24px;
             height: 24px;
@@ -783,6 +907,470 @@
             font-size: 12px;
             color: #595959;
         }
+        
+
+        
+        /* 日志内容样式 */
+        .logs-content {
+            padding: 24px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .logs-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #262626;
+        }
+        
+        .logs-filter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .logs-filter select,
+        .logs-filter input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        /* 日志统计信息 */
+        .logs-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-item {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1890ff;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        .logs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .log-item {
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fff;
+            transition: all 0.3s;
+        }
+        
+        .log-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-color: #d9d9d9;
+        }
+        
+        .log-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .log-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .log-type.create {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .log-type.update {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .log-type.delete {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+        
+        .log-type.import {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .log-type.export {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .log-time {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .log-user {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .log-version {
+            background: #f5f5f5;
+            color: #595959;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: monospace;
+        }
+        
+        .log-content {
+            color: #262626;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        
+        .log-details {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+        
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .detail-label {
+            width: 80px;
+            font-size: 12px;
+            color: #8c8c8c;
+            flex-shrink: 0;
+        }
+        
+        .detail-value {
+            flex: 1;
+            font-size: 12px;
+            color: #262626;
+        }
+        
+        .detail-value.old-value {
+            color: #ff4d4f;
+            text-decoration: line-through;
+        }
+        
+        .detail-value.new-value {
+            color: #52c41a;
+            font-weight: 500;
+        }
+        
+        .log-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .log-action-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .log-action-btn:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        /* 分页控件 */
+        .logs-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 20px 0;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .pagination-btn {
+            padding: 8px 16px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            color: #595959;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        .pagination-size {
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .table-container {
+                min-width: 100%;
+            }
+            
+            .table-header-row,
+            .table-row {
+                min-width: 100%;
+            }
+            
+            .logs-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .logs-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                height: auto;
+                padding: 16px;
+            }
+            
+            .toolbar-left,
+            .toolbar-right {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 12px;
+            }
+            
+            .tab-navigation {
+                margin-left: 0;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .table-grid {
+                padding: 16px;
+            }
+            
+            .logs-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .log-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .log-actions {
+                justify-content: flex-start;
+            }
+            
+            .logs-pagination {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+        
+        /* 代码内容样式 */
+        .code-content {
+            padding: 24px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .code-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #262626;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .code-tabs {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+        }
+        
+        .code-tab-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #595959;
+        }
+        
+        .code-tab-item:hover {
+            color: #1890ff;
+        }
+        
+        .code-tab-item.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+        }
+        
+        .code-editor {
+            background: #f5f5f5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .code-pane {
+            display: none;
+        }
+        
+        .code-pane.active {
+            display: block;
+        }
+        
+        .code-pane pre {
+            margin: 0;
+            padding: 16px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        /* 规范检查内容样式 */
+        .validation-content {
+            padding: 24px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .validation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .validation-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #262626;
+        }
+        
+        .validation-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .validation-results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .validation-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fff;
+            align-items: flex-start;
+        }
+        
+        .validation-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .validation-content {
+            flex: 1;
+        }
+        
+        .validation-title {
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        
+        .validation-desc {
+            color: #595959;
+            font-size: 14px;
+        }
+        
+        .validation-item.success {
+            border-left: 4px solid #52c41a;
+        }
+        
+        .validation-item.warning {
+            border-left: 4px solid #faad14;
+        }
+        
+        .validation-item.error {
+            border-left: 4px solid #ff4d4f;
+        }
     </style>
 </head>
 <body>
@@ -791,17 +1379,57 @@
             <div class="toolbar-left">
                 <button class="toolbar-btn" id="backBtn">← 返回</button>
                 <div class="toolbar-divider"></div>
+                <div class="table-props-row">
+                    <div class="table-prop-item">
+                        <div class="table-title" id="tableTitle" data-editing="false">
+                            <span class="title-text">用户档案表</span>
+                        </div>
+                    </div>
+                    <div class="table-prop-item">
+                        <div class="table-name" id="tableName" data-editing="false">dwd_user_profile</div>
+                    </div>
+                    <div class="table-prop-item">
+                        <select id="layerSelect" class="prop-select" style="width: 100px;">
+                            <option value="">选择分层</option>
+                            <option value="ODS">ODS</option>
+                            <option value="DWD" selected>DWD</option>
+                            <option value="DIM">DIM</option>
+                            <option value="DWS">DWS</option>
+                            <option value="ADS">ADS</option>
+                        </select>
+                    </div>
+                    <div class="table-prop-item">
+                        <select id="themeSelect" class="prop-select" style="width: 100px;">
+                            <option value="">选择主题域</option>
+                            <option value="用户域" selected>用户域</option>
+                            <option value="订单域">订单域</option>
+                            <option value="商品域">商品域</option>
+                            <option value="营销域">营销域</option>
+                        </select>
+                    </div>
+                    <div id="autosaveHint" class="autosave-hint">已自动保存 2024-01-15 15:30</div>
+                </div>
+            </div>
+            
+            <div class="toolbar-right">
                 <button class="toolbar-btn" id="openFieldLibBtn">📚 标准字段库</button>
                 <div class="toolbar-divider"></div>
                 <button class="toolbar-btn" id="columnVisibilityBtn">👁️ 列可见性</button>
                 <div class="toolbar-divider"></div>
                 <button class="toolbar-btn" id="quickImportBtn">📥 快速导入</button>
-            </div>
-            
-            <div class="toolbar-right">
-                <div class="collaboration-status" id="autosaveStatus">
-                    <div class="status-dot"></div>
-                    正在自动保存...
+                <div class="toolbar-divider"></div>
+                <button class="toolbar-btn" id="moreBtn">⋯ 更多</button>
+                <!-- 更多功能下拉菜单 -->
+                <div id="moreDropdown" class="more-dropdown">
+                    <div class="more-menu-item" data-action="logs">
+                        📋 模型日志
+                    </div>
+                    <div class="more-menu-item" data-action="code">
+                        💻 生成代码
+                    </div>
+                    <div class="more-menu-item" data-action="validation">
+                        ✅ 规范检查
+                    </div>
                 </div>
             </div>
         </div>
@@ -812,25 +1440,13 @@
         </div>
         
         <div class="main-content">
-            <!-- 移除侧边栏（字段库/关系/索引/模板） --><!-- 留空占位删除 -->
-            
-            <div class="table-editor">
+            <!-- 数据模型编辑区域 -->
+                <div class="table-editor">
                 <div class="table-header">
                     <div class="header-left">
-                        <div class="table-title" id="tableTitle" data-editing="false">
-                            <span class="title-text">用户档案表</span>
-                            <span class="title-separator"> (</span>
-                            <span class="table-name" id="tableName" data-editing="false">dwd_user_profile</span>
-                            <span class="title-separator">)</span>
-                        </div>
-                        <div class="table-description" id="tableDesc" data-editing="false">存储用户基本信息和档案数据</div>
-                    </div>
-                    <div class="header-right">
-                        <div class="table-props">
-                            <label>分层: <select id="layerSelect" class="prop-select"><option>ODS</option><option selected>DWD</option><option>DIM</option><option>DWS</option><option>ADS</option></select></label>
-                            <label>主题域: <select id="themeSelect" class="prop-select"><option selected>用户域</option><option>订单域</option><option>商品域</option><option>营销域</option></select></label>
-                        </div>
-                        <div id="autosaveHint" class="autosave-hint">已自动保存 2024-01-15 15:30</div>
+                        
+                        <div class="table-description" id="tableDesc" data-editing="false">存储用户基本信息和档案数据<br>包含用户ID、姓名、邮箱等核心信息</div>
+                        
                     </div>
                 </div>
                 
@@ -1050,6 +1666,8 @@
                 </div>
             </div>
             
+
+            
             <!-- 字段库抽屉 -->
             <div id="fieldLibDrawer" class="drawer">
                 <div class="drawer-header">
@@ -1144,7 +1762,7 @@
                             <button class="tab-btn active" data-tab="database">数据库表</button>
                             <button class="tab-btn" data-tab="models">已有模型</button>
                         </div>
-                        <div class="tab-content">
+                        <div class="import-tab-content">
                             <div id="databaseTab" class="tab-pane active">
                                 <div class="search-box">
                                     <input type="text" id="dbTableSearch" placeholder="搜索表名...">
@@ -1165,6 +1783,228 @@
                     </div>
                     <div class="drawer-footer">
                         <button id="importSelectedFields" class="primary-btn">导入选中字段</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 模型日志模态框 -->
+            <div id="logsModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>📋 模型修改日志</h3>
+                        <button class="modal-close" data-modal="logs">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="logs-content">
+                            <div class="logs-header">
+                                <div class="logs-filter">
+                                    <select id="logTypeFilter">
+                                        <option value="all">全部类型</option>
+                                        <option value="create">创建</option>
+                                        <option value="update">修改</option>
+                                        <option value="delete">删除</option>
+                                        <option value="import">导入</option>
+                                        <option value="export">导出</option>
+                                    </select>
+                                    <input type="date" id="logDateFilter">
+                                    <input type="text" id="logUserFilter" placeholder="搜索用户...">
+                                    <button class="toolbar-btn" id="exportLogsBtn">📥 导出日志</button>
+                                </div>
+                            </div>
+                            
+                            <!-- 日志统计信息 -->
+                            <div class="logs-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number">156</div>
+                                    <div class="stat-label">总操作数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">23</div>
+                                    <div class="stat-label">今日操作</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">5</div>
+                                    <div class="stat-label">在线用户</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number">12</div>
+                                    <div class="stat-label">待审核</div>
+                                </div>
+                            </div>
+                            
+                            <div class="logs-list">
+                                <div class="log-item">
+                                    <div class="log-header">
+                                        <span class="log-type create">创建</span>
+                                        <span class="log-time">2024-01-15 15:30:25</span>
+                                        <span class="log-user">张三</span>
+                                        <span class="log-version">v1.2.3</span>
+                                    </div>
+                                    <div class="log-content">创建了字段 "user_level"</div>
+                                    <div class="log-details">
+                                        <div class="detail-row">
+                                            <span class="detail-label">字段名：</span>
+                                            <span class="detail-value">user_level</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">字段类型：</span>
+                                            <span class="detail-value">INT</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">字段描述：</span>
+                                            <span class="detail-value">用户等级（1-普通用户，2-VIP用户，3-超级VIP）</span>
+                                        </div>
+                                    </div>
+                                    <div class="log-actions">
+                                        <button class="log-action-btn">查看详情</button>
+                                        <button class="log-action-btn">回滚此操作</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="log-item">
+                                    <div class="log-header">
+                                        <span class="log-type update">修改</span>
+                                        <span class="log-time">2024-01-15 14:20:10</span>
+                                        <span class="log-user">李四</span>
+                                        <span class="log-version">v1.2.2</span>
+                                    </div>
+                                    <div class="log-content">修改了字段 "email" 的类型从 VARCHAR(100) 到 VARCHAR(255)</div>
+                                    <div class="log-details">
+                                        <div class="detail-row">
+                                            <span class="detail-label">修改前：</span>
+                                            <span class="detail-value old-value">VARCHAR(100)</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">修改后：</span>
+                                            <span class="detail-value new-value">VARCHAR(255)</span>
+                                        </div>
+                                        <div class="detail-row">
+                                            <span class="detail-label">修改原因：</span>
+                                            <span class="detail-value">支持更长的邮箱地址</span>
+                                        </div>
+                                    </div>
+                                    <div class="log-actions">
+                                        <button class="log-action-btn">查看详情</button>
+                                        <button class="log-action-btn">回滚此操作</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 分页控件 -->
+                            <div class="logs-pagination">
+                                <button class="pagination-btn" disabled>上一页</button>
+                                <span class="pagination-info">第 1 页，共 8 页</span>
+                                <button class="pagination-btn">下一页</button>
+                                <span class="pagination-size">每页显示：</span>
+                                <select id="pageSizeSelect">
+                                    <option value="10">10条</option>
+                                    <option value="20" selected>20条</option>
+                                    <option value="50">50条</option>
+                                    <option value="100">100条</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 生成代码模态框 -->
+            <div id="codeModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>💻 生成代码</h3>
+                        <button class="modal-close" data-modal="code">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="code-content">
+                            <div class="code-header">
+                                <div class="code-actions">
+                                    <button class="toolbar-btn">刷新</button>
+                                    <button class="toolbar-btn primary">导出</button>
+                                </div>
+                            </div>
+                            <div class="code-tabs">
+                                <div class="code-tab-item active" data-code-tab="ddl">DDL</div>
+                                <div class="code-tab-item" data-code-tab="sql">SQL</div>
+                                <div class="code-tab-item" data-code-tab="python">Python</div>
+                            </div>
+                            <div class="code-editor">
+                                <div id="ddlCode" class="code-pane active">
+                                    <pre><code>CREATE TABLE dwd_user_profile (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL COMMENT '用户姓名',
+    email VARCHAR(255) COMMENT '邮箱地址',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) COMMENT '用户档案表';</code></pre>
+                                </div>
+                                <div id="sqlCode" class="code-pane">
+                                    <pre><code>-- 用户档案数据查询
+SELECT 
+    id,
+    name,
+    email,
+    created_at,
+    updated_at
+FROM dwd_user_profile
+WHERE created_at >= '2024-01-01';</code></pre>
+                                </div>
+                                <div id="pythonCode" class="code-pane">
+                                    <pre><code># 用户档案数据处理
+import pandas as pd
+from sqlalchemy import create_engine
+
+def process_user_profile():
+    engine = create_engine('mysql://user:pass@localhost/warehouse')
+    df = pd.read_sql('SELECT * FROM dwd_user_profile', engine)
+    # 数据处理逻辑
+    return df</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 规范检查模态框 -->
+            <div id="validationModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>✅ 数据治理规范检查</h3>
+                        <button class="modal-close" data-modal="validation">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="validation-content">
+                            <div class="validation-header">
+                                <div class="validation-actions">
+                                    <button class="toolbar-btn primary">开始检查</button>
+                                    <button class="toolbar-btn">导出报告</button>
+                                </div>
+                            </div>
+                            <div class="validation-results">
+                                <div class="validation-item success">
+                                    <div class="validation-icon">✅</div>
+                                    <div class="validation-content">
+                                        <div class="validation-title">命名规范检查</div>
+                                        <div class="validation-desc">表名和字段名符合命名规范</div>
+                                    </div>
+                                </div>
+                                <div class="validation-item warning">
+                                    <div class="validation-icon">⚠️</div>
+                                    <div class="validation-content">
+                                        <div class="validation-title">字段类型检查</div>
+                                        <div class="validation-desc">建议将 email 字段类型改为 VARCHAR(100)</div>
+                                    </div>
+                                </div>
+                                <div class="validation-item error">
+                                    <div class="validation-icon">❌</div>
+                                    <div class="validation-content">
+                                        <div class="validation-title">主键检查</div>
+                                        <div class="validation-desc">缺少主键约束</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1193,6 +2033,7 @@
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.value = currentText;
+                    input.placeholder = '请输入表中文名';
                     input.className = 'title-edit-input';
                     input.style.width = '100%';
                     input.style.border = '1px solid #1890ff';
@@ -1211,12 +2052,12 @@
                     function saveEdit() {
                         const newValue = input.value.trim();
                         if (newValue) {
-                            element.innerHTML = `<span class="title-text">${newValue}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            element.innerHTML = `<span class="title-text">${newValue}</span>`;
                             element.setAttribute('data-editing', 'false');
                             markDirty();
                         } else {
-                            // 恢复原值
-                            element.innerHTML = `<span class="title-text">${currentText}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            // 显示占位符提示
+                            element.innerHTML = `<span class="title-text" style="color: #d9d9d9;">请输入表中文名</span>`;
                             element.setAttribute('data-editing', 'false');
                         }
                     }
@@ -1226,7 +2067,11 @@
                         if (e.key === 'Enter') {
                             saveEdit();
                         } else if (e.key === 'Escape') {
-                            element.innerHTML = `<span class="title-text">${currentText}</span><span class="title-separator"> (</span><span class="table-name" id="tableName" data-editing="false">${document.getElementById('tableName').textContent}</span><span class="title-separator">)</span>`;
+                            if (currentText && currentText.trim()) {
+                                element.innerHTML = `<span class="title-text">${currentText}</span>`;
+                            } else {
+                                element.innerHTML = `<span class="title-text" style="color: #d9d9d9;">请输入表中文名</span>`;
+                            }
                             element.setAttribute('data-editing', 'false');
                         }
                     });
@@ -1235,6 +2080,7 @@
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.value = currentText;
+                    input.placeholder = '请输入表英文名';
                     input.className = 'title-edit-input';
                     input.style.width = '100%';
                     input.style.border = '1px solid #1890ff';
@@ -1257,8 +2103,8 @@
                             element.setAttribute('data-editing', 'false');
                             markDirty();
                         } else {
-                            // 恢复原值
-                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${currentText}</span>`;
+                            // 显示占位符提示
+                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false" style="color: #d9d9d9;">请输入表英文名</span>`;
                             element.setAttribute('data-editing', 'false');
                         }
                     }
@@ -1268,7 +2114,11 @@
                         if (e.key === 'Enter') {
                             saveEdit();
                         } else if (e.key === 'Escape') {
-                            element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${currentText}</span>`;
+                            if (currentText && currentText.trim()) {
+                                element.innerHTML = `<span class="table-name" id="tableName" data-editing="false">${currentText}</span>`;
+                            } else {
+                                element.innerHTML = `<span class="table-name" id="tableName" data-editing="false" style="color: #d9d9d9;">请输入表英文名</span>`;
+                            }
                             element.setAttribute('data-editing', 'false');
                         }
                     });
@@ -1296,12 +2146,13 @@
                     function saveEdit() {
                         const newValue = input.value.trim();
                         if (newValue) {
-                            element.textContent = newValue;
+                            // 支持换行显示，保持原有的换行符
+                            element.innerHTML = newValue.replace(/\n/g, '<br>');
                             element.setAttribute('data-editing', 'false');
                             markDirty();
                         } else {
-                            // 恢复原值
-                            element.textContent = currentText;
+                            // 显示占位符提示
+                            element.innerHTML = `<span style="color: #d9d9d9;">请输入表描述</span>`;
                             element.setAttribute('data-editing', 'false');
                         }
                     }
@@ -1315,7 +2166,11 @@
                             e.preventDefault();
                             saveEdit();
                         } else if (e.key === 'Escape') {
-                            element.textContent = currentText;
+                            if (currentText && currentText.trim()) {
+                                element.innerHTML = currentText.replace(/\n/g, '<br>');
+                            } else {
+                                element.innerHTML = `<span style="color: #d9d9d9;">请输入表描述</span>`;
+                            }
                             element.setAttribute('data-editing', 'false');
                         }
                     });
@@ -1327,6 +2182,86 @@
         makeEditable(document.getElementById('tableTitle'), 'name');
         makeEditable(document.getElementById('tableName'), 'tableName');
         makeEditable(document.getElementById('tableDesc'), 'desc');
+        
+        // 初始化空状态显示
+        function initEmptyStates() {
+            const tableTitle = document.getElementById('tableTitle');
+            const tableName = document.getElementById('tableName');
+            const tableDesc = document.getElementById('tableDesc');
+            
+            if (!tableTitle.querySelector('.title-text').textContent.trim()) {
+                tableTitle.innerHTML = '<span class="title-text" style="color: #d9d9d9;">请输入表中文名</span>';
+            }
+            
+            if (!tableName.textContent.trim()) {
+                tableName.innerHTML = '<span class="table-name" style="color: #d9d9d9;">请输入表英文名</span>';
+            }
+            
+            if (!tableDesc.textContent.trim()) {
+                tableDesc.innerHTML = '<span style="color: #d9d9d9;">请输入表描述</span>';
+            }
+        }
+        
+        // 页面加载完成后初始化空状态
+        document.addEventListener('DOMContentLoaded', initEmptyStates);
+        
+        // 更多按钮下拉菜单功能
+        const moreBtn = document.getElementById('moreBtn');
+        const moreDropdown = document.getElementById('moreDropdown');
+        
+        moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            moreDropdown.classList.toggle('visible');
+        });
+        
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', () => {
+            moreDropdown.classList.remove('visible');
+        });
+        
+        // 更多菜单项点击事件
+        document.querySelectorAll('.more-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const action = item.getAttribute('data-action');
+                const modal = document.getElementById(action + 'Modal');
+                if (modal) {
+                    modal.classList.add('visible');
+                }
+                moreDropdown.classList.remove('visible');
+            });
+        });
+        
+        // 模态框关闭功能
+        document.querySelectorAll('.modal-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                const modal = closeBtn.getAttribute('data-modal');
+                document.getElementById(modal + 'Modal').classList.remove('visible');
+            });
+        });
+        
+        // 点击模态框背景关闭
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('visible');
+                }
+            });
+        });
+        
+        // 代码Tab内部切换（在模态框中）
+        document.querySelectorAll('.code-tab-item').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const codeTabName = tab.getAttribute('data-code-tab');
+                
+                // 更新代码Tab状态
+                document.querySelectorAll('.code-tab-item').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 更新代码内容
+                document.querySelectorAll('.code-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById(codeTabName + 'Code').classList.add('active');
+            });
+        });
         
         // 字段库抽屉逻辑与插入
         const drawer = document.getElementById('fieldLibDrawer');
@@ -1635,17 +2570,107 @@
         let saveTimer;
         function markDirty() {
             const status = document.getElementById('autosaveStatus');
-            status.innerHTML = '<div class="status-dot"></div> 正在自动保存...';
+            if (status) {
+                status.innerHTML = '<div class="status-dot"></div> 正在自动保存...';
+            }
             clearTimeout(saveTimer);
             saveTimer = setTimeout(() => {
                 const now = new Date();
                 const hh = String(now.getHours()).padStart(2, '0');
                 const mm = String(now.getMinutes()).padStart(2, '0');
                 const ts = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${hh}:${mm}`;
-                document.getElementById('autosaveHint').textContent = `已自动保存 ${ts}`;
-                status.innerHTML = '<div class="status-dot"></div> 已自动保存';
+                const autosaveHint = document.getElementById('autosaveHint');
+                if (autosaveHint) {
+                    autosaveHint.textContent = `已自动保存 ${ts}`;
+                }
+                if (status) {
+                    status.innerHTML = '<div class="status-dot"></div> 已自动保存';
+                }
             }, 1200);
         }
+        
+        // 日志筛选功能
+        function filterLogs() {
+            const typeFilter = document.getElementById('logTypeFilter').value;
+            const dateFilter = document.getElementById('logDateFilter').value;
+            const userFilter = document.getElementById('logUserFilter').value.toLowerCase();
+            
+            const logItems = document.querySelectorAll('.log-item');
+            
+            logItems.forEach(item => {
+                const logType = item.querySelector('.log-type').textContent;
+                const logTime = item.querySelector('.log-time').textContent;
+                const logUser = item.querySelector('.log-user').textContent.toLowerCase();
+                
+                let showItem = true;
+                
+                // 类型筛选
+                if (typeFilter !== 'all' && !logType.toLowerCase().includes(typeFilter.toLowerCase())) {
+                    showItem = false;
+                }
+                
+                // 日期筛选
+                if (dateFilter && !logTime.includes(dateFilter)) {
+                    showItem = false;
+                }
+                
+                // 用户筛选
+                if (userFilter && !logUser.includes(userFilter)) {
+                    showItem = false;
+                }
+                
+                item.style.display = showItem ? 'block' : 'none';
+            });
+        }
+        
+        // 绑定日志筛选事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeFilter = document.getElementById('logTypeFilter');
+            const dateFilter = document.getElementById('logDateFilter');
+            const userFilter = document.getElementById('logUserFilter');
+            
+            if (typeFilter) typeFilter.addEventListener('change', filterLogs);
+            if (dateFilter) dateFilter.addEventListener('change', filterLogs);
+            if (userFilter) userFilter.addEventListener('input', filterLogs);
+            
+            // 导出日志功能
+            const exportLogsBtn = document.getElementById('exportLogsBtn');
+            if (exportLogsBtn) {
+                exportLogsBtn.addEventListener('click', function() {
+                    alert('日志导出功能：支持导出为Excel、CSV、PDF等格式');
+                });
+            }
+            
+            // 日志操作按钮事件
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('log-action-btn')) {
+                    const action = e.target.textContent;
+                    if (action === '查看详情') {
+                        alert('查看操作详情：显示完整的修改前后对比信息');
+                    } else if (action === '回滚此操作') {
+                        if (confirm('确定要回滚此操作吗？这将撤销该操作的所有更改。')) {
+                            alert('操作已回滚');
+                        }
+                    } else if (action === '恢复此字段') {
+                        if (confirm('确定要恢复此字段吗？')) {
+                            alert('字段已恢复');
+                        }
+                    } else if (action === '查看导入报告') {
+                        alert('导入报告：显示导入的详细统计信息和结果');
+                    } else if (action === '重新下载') {
+                        alert('重新下载：重新生成并下载文件');
+                    }
+                }
+            });
+            
+            // 分页功能
+            const pageSizeSelect = document.getElementById('pageSizeSelect');
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener('change', function() {
+                    alert(`每页显示 ${this.value} 条记录`);
+                });
+            }
+        });
 
         // 监听输入变更以触发自动保存
         document.addEventListener('input', (e) => {

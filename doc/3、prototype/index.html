@@ -100,45 +100,9 @@
             flex: 1;
             white-space: nowrap;
         }
-        .submenu-arrow {
-            margin-left: 8px;
-            color: rgba(255,255,255,0.45);
-            font-size: 12px;
-            transition: transform 0.2s;
-            display: inline-flex; align-items: center;
-        }
-        .submenu-arrow .iconify { font-size: 14px; color: rgba(255,255,255,0.45); }
-        .has-submenu.open > .submenu-arrow { transform: rotate(90deg); }
-
-        .sidebar.collapsed .menu-item .label,
-        .sidebar.collapsed .menu-item .submenu-arrow {
+        .sidebar.collapsed .menu-item .label {
             display: none;
         }
-
-        .submenu {
-            margin: 4px 0 8px;
-        }
-        .submenu-item {
-            display: flex;
-            align-items: center;
-            height: 40px;
-            padding: 0 16px 0 44px; /* 缩进对齐 */
-            cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 6px;
-            margin: 2px 8px;
-            color: rgba(255,255,255,0.65);
-            font-size: 14px;
-        }
-        .submenu-item:hover {
-            background-color: rgba(255,255,255,0.12);
-            color: #fff;
-        }
-        .submenu-item.active {
-            background-color: #1677ff;
-            color: #fff;
-        }
-        .sidebar.collapsed .submenu { display: none !important; }
 
         /* 简约统一图标占位（非 emoji） */
         /* 去除 simple-icon，改用 ant-design 图标 */
@@ -224,16 +188,14 @@
                     <span class="label">首页</span>
                 </div>
 
-                <div class="menu-item has-submenu" id="menu-modeling">
-                    <span class="icon"><span class="iconify" data-icon="ant-design:appstore-outlined"></span></span>
-                    <span class="label">数据建模</span>
-                    <span class="submenu-arrow"><span class="iconify" data-icon="ant-design:right-outlined"></span></span>
+                <div class="menu-item" onclick="loadPage('model-management', '模型管理')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:profile-outlined"></span></span>
+                    <span class="label">模型管理</span>
                 </div>
-                <div class="submenu" id="submenu-modeling" style="display:none;">
-                    <div class="submenu-item" onclick="loadPage('model-management', '模型管理')">
-                        <span class="icon"><span class="iconify" data-icon="ant-design:profile-outlined"></span></span>
-                        <span class="label">模型管理</span>
-                    </div>
+
+                <div class="menu-item" onclick="loadPage('data-source-management', '数据源管理')">
+                    <span class="icon"><span class="iconify" data-icon="ant-design:database-outlined"></span></span>
+                    <span class="label">数据源管理</span>
                 </div>
 
                 <div class="menu-item" onclick="loadPage('lineage', '血缘关系')">
@@ -251,11 +213,6 @@
                     <span class="label">数据治理</span>
                 </div>
 
-                <div class="menu-item" onclick="loadPage('document-management', '文档管理')">
-                    <span class="icon"><span class="iconify" data-icon="ant-design:file-text-outlined"></span></span>
-                    <span class="label">文档管理</span>
-                </div>
-
                 <div class="menu-item" onclick="loadPage('system-settings', '系统设置')">
                     <span class="icon"><span class="iconify" data-icon="ant-design:setting-outlined"></span></span>
                     <span class="label">系统设置</span>
@@ -269,7 +226,7 @@
                 <h2 id="page-title">欢迎使用湖仓建模工具</h2>
                 <div class="breadcrumb" id="breadcrumb">首页</div>
                 <div class="global-search" style="margin-left:32px;flex:1;max-width:400px;">
-                    <input type="text" id="globalSearchInput" placeholder="全局搜索模型、表、字段、文档..." style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;" onkeydown="if(event.key==='Enter'){doGlobalSearch();}">
+                    <input type="text" id="globalSearchInput" placeholder="全局搜索模型、表、字段..." style="width:100%;padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;" onkeydown="if(event.key==='Enter'){doGlobalSearch();}">
                 </div>
                 <div class="topbar-user" id="topbarUser">
                     <div class="avatar">U</div>
@@ -294,6 +251,10 @@
                             <h3>📋 模型管理</h3>
                             <p>管理已创建的模型和表结构，支持版本管理、导出、在线建模、DDL导入等操作。</p>
                         </div>
+                        <div class="feature-card" onclick="loadPage('data-source-management', '数据源管理')">
+                            <h3>🔌 数据源管理</h3>
+                            <p>统一管理所有数据源连接配置，支持多种数据库类型，提供数据源列表和表结构查看功能。</p>
+                        </div>
                         <div class="feature-card" onclick="loadPage('lineage', '血缘关系')">
                             <h3>🔄 血缘关系</h3>
                             <p>可视化展示模型血缘关系，支持血缘深度控制，血缘路径追踪等功能。</p>
@@ -306,10 +267,7 @@
                             <h3>🛡️ 数据治理</h3>
                             <p>提供智能化的数据治理能力，包括质量检测、规则配置、治理报告等。</p>
                         </div>
-                        <div class="feature-card" onclick="loadPage('document-management', '文档管理')">
-                            <h3>📝 文档管理</h3>
-                            <p>管理建模文档和协作，支持版本历史、协作状态、评论系统等。</p>
-                        </div>
+
                     </div>
                 </div>
                 
@@ -321,17 +279,15 @@
     <script>
         function loadPage(page, title) {
             document.getElementById('page-title').textContent = title;
-                const map = {
+            const map = {
                 'dashboard': '首页',
-                'online-modeling': '数据建模 / 在线建模',
-                'ddl-import': '数据建模 / DDL导入',
-                'model-management': '数据建模 / 模型管理',
+                'model-management': '模型管理',
+                'data-source-management': '数据源管理',
                 'lineage': '血缘关系',
                 'field-library': '标准字段库',
                 'data-governance': '数据治理',
-                'document-management': '文档管理',
                 'system-settings': '系统设置',
-                    'security-settings': '安全设置'
+                'security-settings': '安全设置'
             };
             document.getElementById('breadcrumb').textContent = `首页 / ${map[page] || title}`;
             document.getElementById('welcome-content').style.display = 'none';
@@ -342,7 +298,7 @@
         }
         
         function updateMenuState(activePage) {
-            document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
+            document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
             const activeItem = document.querySelector(`[onclick*="${activePage}"]`);
@@ -387,27 +343,14 @@
         siderTrigger.onclick = function() {
             collapsed = !collapsed;
             sidebar.classList.toggle('collapsed', collapsed);
-            if (collapsed) {
-                document.getElementById('submenu-modeling').style.display = 'none';
-                document.getElementById('menu-modeling').classList.remove('open');
-            }
             renderTrigger();
         };
         renderTrigger();
 
-        // 二级菜单展开/收起
-        const modelingMenu = document.getElementById('menu-modeling');
-        const modelingSubmenu = document.getElementById('submenu-modeling');
-        modelingMenu.onclick = function() {
-            if (collapsed) return;
-            const isOpen = modelingMenu.classList.toggle('open');
-            modelingSubmenu.style.display = isOpen ? 'block' : 'none';
-        };
-
         function doGlobalSearch() {
             const val = document.getElementById('globalSearchInput').value.trim();
             if(val) {
-                alert('全局搜索功能原型：' + val + '\n（此处可弹出全局搜索结果面板，支持模型、表、字段、文档等分组展示）');
+                alert('全局搜索功能原型：' + val + '\n（此处可弹出全局搜索结果面板，支持模型、表、字段等分组展示）');
             }
         }
     </script>

@@ -23,21 +23,7 @@
             margin: 0 auto;
         }
         
-        .page-header {
-            margin-bottom: 24px;
-        }
-        
-        .page-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #262626;
-            margin-bottom: 8px;
-        }
-        
-        .page-subtitle {
-            color: #8c8c8c;
-            font-size: 14px;
-        }
+
         
         .settings-tabs {
             background: #fff;
@@ -519,17 +505,14 @@
 </head>
 <body>
     <div class="settings-container">
-        <div class="page-header">
-            <h1 class="page-title">系统设置</h1>
-            <p class="page-subtitle">系统配置和用户管理，包括权限配置、数据源管理等</p>
-        </div>
+
         
         <div class="settings-tabs">
             <div class="tab-header">
                 <button class="tab-btn active" onclick="switchTab('general')">⚙️ 基本设置</button>
                 <button class="tab-btn" onclick="switchTab('users')">👥 用户管理</button>
                 <button class="tab-btn" onclick="switchTab('permissions')">🔐 权限配置</button>
-                <button class="tab-btn" onclick="switchTab('connections')">🔗 数据源管理</button>
+                <button class="tab-btn" onclick="switchTab('configurations')">⚙️ 公共配置</button>
                 <button class="tab-btn" onclick="switchTab('logs')">📋 系统日志</button>
             </div>
             
@@ -797,74 +780,176 @@
                 <button class="save-btn">💾 保存权限</button>
             </div>
             
-            <!-- 数据源管理 -->
-            <div id="connectionsTab" class="tab-content">
+            <!-- 公共配置 -->
+            <div id="configurationsTab" class="tab-content">
                 <div class="section-title">
-                    🔗 数据源管理
+                    🏷️ 主题域配置
                 </div>
                 <div class="section-subtitle">
-                    管理系统连接的数据源，包括数据库连接、API接口等
+                    管理公共的主题域分类，支持新增、编辑、删除、排序等操作
                 </div>
                 
                 <div class="connection-list">
                     <div class="connection-header">
-                        数据源列表 (共 5 个)
+                        主题域列表 (共 6 个)
                     </div>
                     
                     <div class="connection-item">
-                        <div class="connection-icon">🐘</div>
+                        <div class="connection-icon">👤</div>
                         <div class="connection-info">
-                            <div class="connection-name">生产环境PostgreSQL</div>
-                            <div class="connection-details">postgresql://prod.example.com:5432/warehouse</div>
+                            <div class="connection-name">用户域</div>
+                            <div class="connection-details">用户相关的数据模型，包括用户信息、用户行为等</div>
                         </div>
                         <div class="connection-status">
                             <div class="status-dot"></div>
-                            连接正常
+                            已启用
                         </div>
                         <div class="connection-actions">
-                            <button class="connection-btn">测试</button>
                             <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
                             <button class="connection-btn danger">删除</button>
                         </div>
                     </div>
                     
                     <div class="connection-item">
-                        <div class="connection-icon">🐬</div>
+                        <div class="connection-icon">🛒</div>
                         <div class="connection-info">
-                            <div class="connection-name">测试环境MySQL</div>
-                            <div class="connection-details">mysql://test.example.com:3306/testdb</div>
+                            <div class="connection-name">订单域</div>
+                            <div class="connection-details">订单相关的数据模型，包括订单信息、支付信息等</div>
                         </div>
                         <div class="connection-status">
                             <div class="status-dot"></div>
-                            连接正常
+                            已启用
                         </div>
                         <div class="connection-actions">
-                            <button class="connection-btn">测试</button>
                             <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
                             <button class="connection-btn danger">删除</button>
                         </div>
                     </div>
                     
                     <div class="connection-item">
-                        <div class="connection-icon">🍯</div>
+                        <div class="connection-icon">📦</div>
                         <div class="connection-info">
-                            <div class="connection-name">Hive数据仓库</div>
-                            <div class="connection-details">hive://hive.example.com:10000/default</div>
+                            <div class="connection-name">商品域</div>
+                            <div class="connection-details">商品相关的数据模型，包括商品信息、库存信息等</div>
                         </div>
                         <div class="connection-status">
                             <div class="status-dot"></div>
-                            连接正常
+                            已启用
                         </div>
                         <div class="connection-actions">
-                            <button class="connection-btn">测试</button>
                             <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
                             <button class="connection-btn danger">删除</button>
                         </div>
                     </div>
                 </div>
                 
                 <div class="add-connection-btn">
-                    + 添加新数据源
+                    + 添加新主题域
+                </div>
+
+                <div class="section-title" style="margin-top: 48px;">
+                    📊 分层配置
+                </div>
+                <div class="section-subtitle">
+                    管理公共的数仓分层配置，支持自定义分层名称和描述
+                </div>
+                
+                <div class="connection-list">
+                    <div class="connection-header">
+                        分层列表 (共 5 个)
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">📥</div>
+                        <div class="connection-info">
+                            <div class="connection-name">ODS (原始数据层)</div>
+                            <div class="connection-details">原始数据存储层，保持数据的原始状态，不做任何处理</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            已启用
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">🔧</div>
+                        <div class="connection-info">
+                            <div class="connection-name">DWD (明细数据层)</div>
+                            <div class="connection-details">明细数据层，对原始数据进行清洗、转换、标准化处理</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            已启用
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">📋</div>
+                        <div class="connection-info">
+                            <div class="connection-name">DIM (维度数据层)</div>
+                            <div class="connection-details">维度数据层，存储各种维度信息，如时间、地区、用户等</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            已启用
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">📈</div>
+                        <div class="connection-info">
+                            <div class="connection-name">DWS (汇总数据层)</div>
+                            <div class="connection-details">汇总数据层，对明细数据进行轻度汇总，形成主题宽表</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            已启用
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                    
+                    <div class="connection-item">
+                        <div class="connection-icon">🎯</div>
+                        <div class="connection-info">
+                            <div class="connection-name">ADS (应用数据层)</div>
+                            <div class="connection-details">应用数据层，面向业务应用的数据集市，支持即席查询</div>
+                        </div>
+                        <div class="connection-status">
+                            <div class="status-dot"></div>
+                            已启用
+                        </div>
+                        <div class="connection-actions">
+                            <button class="connection-btn">编辑</button>
+                            <button class="connection-btn">排序</button>
+                            <button class="connection-btn danger">删除</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-connection-btn">
+                    + 添加新分层
                 </div>
             </div>
             
@@ -1005,28 +1090,35 @@
             // 这里可以打开添加用户的弹窗
         });
         
-        // 数据源操作按钮
+        // 公共配置操作按钮
         document.querySelectorAll('.connection-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const action = btn.textContent;
-                const connectionName = btn.closest('.connection-item').querySelector('.connection-name').textContent;
+                const itemName = btn.closest('.connection-item').querySelector('.connection-name').textContent;
                 
-                if (action === '测试') {
-                    console.log('测试连接:', connectionName);
-                } else if (action === '编辑') {
-                    console.log('编辑连接:', connectionName);
+                if (action === '编辑') {
+                    console.log('编辑配置:', itemName);
+                } else if (action === '排序') {
+                    console.log('排序配置:', itemName);
                 } else if (action === '删除') {
-                    if (confirm(`确定要删除数据源 "${connectionName}" 吗？`)) {
-                        console.log('删除数据源:', connectionName);
+                    if (confirm(`确定要删除 "${itemName}" 吗？`)) {
+                        console.log('删除配置:', itemName);
                     }
                 }
             });
         });
         
-        // 添加数据源按钮
-        document.querySelector('.add-connection-btn').addEventListener('click', () => {
-            console.log('添加新数据源');
-            // 这里可以打开添加数据源的弹窗
+        // 添加主题域按钮
+        document.querySelectorAll('.add-connection-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const btnText = btn.textContent;
+                if (btnText.includes('主题域')) {
+                    console.log('添加新主题域');
+                } else if (btnText.includes('分层')) {
+                    console.log('添加新分层');
+                }
+                // 这里可以打开相应的添加弹窗
+            });
         });
         
         // 权限复选框

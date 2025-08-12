@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据源管理 - 湖仓建模工具</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background-color: #fff;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: #001529;
+            color: white;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            padding: 0 24px;
+        }
+        
+        .logo h1 {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 4px;
+        }
+        
+        .header .search-input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            width: 200px;
+            outline: none;
+        }
+        
+        .header .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .search-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .username {
+            color: rgba(255,255,255,0.85);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .main-container {
+            display: flex;
+            margin-top: 64px;
+            height: calc(100vh - 64px);
+        }
+        
+        .sidebar {
+            width: 200px;
+            background: #001529;
+            color: white;
+            overflow-y: auto;
+        }
+        
+        .sidebar-nav {
+            padding: 16px 0;
+        }
+        
+        .nav-list {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin: 4px 16px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .nav-icon {
+            font-size: 16px;
+        }
+        
+        .nav-text {
+            font-size: 14px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+
+        
+        .data-source-tabs {
+            margin-bottom: 20px;
+        }
+        
+        .data-source-tabs .tab-item {
+            display: inline-block;
+            padding: 12px 24px;
+            margin-right: 8px;
+            background: #f5f5f5;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .data-source-tabs .tab-item.active {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .action-bar .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+        
+        .status-error {
+            background: #fff2f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+        
+        .status-warning {
+            background: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-small:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .btn-danger {
+            color: #ff4d4f;
+            border-color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 8px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .pagination button.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+        
+        .pagination button:hover:not(.active) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8c8c8c;
+        }
+        
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #262626;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #8c8c8c;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #262626;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="data-source-container">
+
+
+                <!-- 标签页导航 -->
+                <div class="data-source-tabs">
+                    <div class="tab-item active" data-tab="datasource">数据源管理列表</div>
+                    <div class="tab-item" data-tab="tables">数据表列表</div>
+                </div>
+
+                <!-- 数据源管理列表标签页 -->
+                <div id="datasource-tab" class="tab-content active">
+                    <div class="action-bar">
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="搜索数据源名称...">
+                            <select class="filter-select">
+                                <option value="">所有类型</option>
+                                <option value="mysql">MySQL</option>
+                                <option value="postgresql">PostgreSQL</option>
+                                <option value="hive">Hive</option>
+                                <option value="clickhouse">ClickHouse</option>
+                            </select>
+                            <select class="filter-select">
+                                <option value="">所有状态</option>
+                                <option value="active">已启用</option>
+                                <option value="inactive">已禁用</option>
+                                <option value="error">连接错误</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" onclick="showAddDataSourceModal()">+ 新增数据源</button>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>数据源名称</th>
+                                <th>类型</th>
+                                <th>连接信息</th>
+                                <th>状态</th>
+                                <th>最后同步</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>用户中心数据库</td>
+                                <td>MySQL</td>
+                                <td>192.168.1.100:3306/user_center</td>
+                                <td><span class="status-badge status-success">已启用</span></td>
+                                <td>2024-01-15 14:30:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">编辑</button>
+                                    <button class="btn-small">测试</button>
+                                    <button class="btn-small">同步</button>
+                                    <button class="btn-small btn-danger">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>订单系统数据库</td>
+                                <td>PostgreSQL</td>
+                                <td>192.168.1.101:5432/order_system</td>
+                                <td><span class="status-badge status-success">已启用</span></td>
+                                <td>2024-01-15 13:45:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">编辑</button>
+                                    <button class="btn-small">测试</button>
+                                    <button class="btn-small">同步</button>
+                                    <button class="btn-small btn-danger">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>商品数据仓库</td>
+                                <td>Hive</td>
+                                <td>hive-server:10000/product_warehouse</td>
+                                <td><span class="status-badge status-warning">已禁用</span></td>
+                                <td>2024-01-14 09:15:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">编辑</button>
+                                    <button class="btn-small">测试</button>
+                                    <button class="btn-small">同步</button>
+                                    <button class="btn-small btn-danger">删除</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>日志分析库</td>
+                                <td>ClickHouse</td>
+                                <td>clickhouse-server:9000/log_analysis</td>
+                                <td><span class="status-badge status-error">连接错误</span></td>
+                                <td>2024-01-13 16:20:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">编辑</button>
+                                    <button class="btn-small">测试</button>
+                                    <button class="btn-small">同步</button>
+                                    <button class="btn-small btn-danger">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <button>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+
+                <!-- 数据表列表标签页 -->
+                <div id="tables-tab" class="tab-content">
+                    <div class="action-bar">
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="搜索表名...">
+                            <select class="filter-select">
+                                <option value="">所有数据源</option>
+                                <option value="user_center">用户中心数据库</option>
+                                <option value="order_system">订单系统数据库</option>
+                                <option value="product_warehouse">商品数据仓库</option>
+                                <option value="log_analysis">日志分析库</option>
+                            </select>
+                            <select class="filter-select">
+                                <option value="">所有数据库</option>
+                                <option value="user_center">user_center</option>
+                                <option value="order_system">order_system</option>
+                                <option value="product_warehouse">product_warehouse</option>
+                                <option value="log_analysis">log_analysis</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary">批量同步</button>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>表名</th>
+                                <th>数据源</th>
+                                <th>数据库</th>
+                                <th>表类型</th>
+                                <th>字段数</th>
+                                <th>记录数</th>
+                                <th>最后同步</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>user_info</td>
+                                <td>用户中心数据库</td>
+                                <td>user_center</td>
+                                <td>表</td>
+                                <td>15</td>
+                                <td>1,234,567</td>
+                                <td>2024-01-15 14:30:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">查看结构</button>
+                                    <button class="btn-small">导出</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>order_detail</td>
+                                <td>订单系统数据库</td>
+                                <td>order_system</td>
+                                <td>表</td>
+                                <td>22</td>
+                                <td>5,678,901</td>
+                                <td>2024-01-15 13:45:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">查看结构</button>
+                                    <button class="btn-small">导出</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>product_info</td>
+                                <td>商品数据仓库</td>
+                                <td>product_warehouse</td>
+                                <td>表</td>
+                                <td>18</td>
+                                <td>89,123</td>
+                                <td>2024-01-14 09:15:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">查看结构</button>
+                                    <button class="btn-small">导出</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>user_login_log</td>
+                                <td>用户中心数据库</td>
+                                <td>user_center</td>
+                                <td>表</td>
+                                <td>8</td>
+                                <td>12,345,678</td>
+                                <td>2024-01-15 14:30:00</td>
+                                <td class="action-buttons">
+                                    <button class="btn-small">查看结构</button>
+                                    <button class="btn-small">导出</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <button>上一页</button>
+                        <button class="active">1</button>
+                        <button>2</button>
+                        <button>3</button>
+                        <button>下一页</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 新增数据源模态框 -->
+    <div id="addDataSourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">新增数据源</h3>
+                <button class="close-btn" onclick="hideAddDataSourceModal()">&times;</button>
+            </div>
+            <form>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">数据源名称 *</label>
+                        <input type="text" class="form-input" placeholder="请输入数据源名称" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">数据库类型 *</label>
+                        <select class="form-input" required>
+                            <option value="">请选择数据库类型</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="postgresql">PostgreSQL</option>
+                            <option value="hive">Hive</option>
+                            <option value="clickhouse">ClickHouse</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">主机地址 *</label>
+                        <input type="text" class="form-input" placeholder="请输入主机地址" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">端口 *</label>
+                        <input type="number" class="form-input" placeholder="请输入端口号" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">数据库名 *</label>
+                        <input type="text" class="form-input" placeholder="请输入数据库名" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Schema</label>
+                        <input type="text" class="form-input" placeholder="请输入Schema（可选）">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">用户名 *</label>
+                        <input type="text" class="form-input" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">密码 *</label>
+                        <input type="password" class="form-input" placeholder="请输入密码" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea class="form-input" rows="3" placeholder="请输入数据源描述（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-small" onclick="hideAddDataSourceModal()">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 标签页切换功能
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有活动状态
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 设置当前标签页为活动状态
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+
+        // 显示新增数据源模态框
+        function showAddDataSourceModal() {
+            document.getElementById('addDataSourceModal').classList.add('active');
+        }
+
+        // 隐藏新增数据源模态框
+        function hideAddDataSourceModal() {
+            document.getElementById('addDataSourceModal').classList.remove('active');
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('addDataSourceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAddDataSourceModal();
+            }
+        });
+
+        // 表格行点击事件
+        document.querySelectorAll('.data-table tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // 如果点击的是按钮，不触发行选择
+                if (e.target.tagName === 'BUTTON') {
+                    return;
+                }
+                
+                // 移除其他行的选中状态
+                document.querySelectorAll('.data-table tbody tr').forEach(r => r.classList.remove('selected'));
+                // 添加当前行的选中状态
+                this.classList.add('selected');
+            });
+        });
+
+        // 搜索功能
+        document.querySelectorAll('.search-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const table = this.closest('.tab-content').querySelector('.data-table tbody');
+                const rows = table.querySelectorAll('tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 筛选功能
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const filterValue = this.value.toLowerCase();
+                const table = this.closest('.tab-content').querySelector('.data-table tbody');
+                const rows = table.querySelectorAll('tr');
+                
+                if (!filterValue) {
+                    rows.forEach(row => row.style.display = '');
+                    return;
+                }
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    let shouldShow = false;
+                    
+                    cells.forEach(cell => {
+                        if (cell.textContent.toLowerCase().includes(filterValue)) {
+                            shouldShow = true;
+                        }
+                    });
+                    
+                    row.style.display = shouldShow ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
