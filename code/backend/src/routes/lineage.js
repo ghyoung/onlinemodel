@@ -11,12 +11,12 @@ router.get('/', authenticateToken, async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     
     // 获取总数
-    const countResult = await db.get('SELECT COUNT(*) as total FROM lineage');
-    const total = countResult.total;
+    const countResult = await db.query('SELECT COUNT(*) as total FROM lineage');
+    const total = parseInt(countResult.rows[0].total);
     const offset = (page - 1) * limit;
     
     // 获取血缘关系列表
-    const lineages = await db.all(
+    const lineagesResult = await db.query(
       `SELECT l.*, 
               st.table_name as source_table_name,
               sc.column_name as source_column_name,
@@ -28,9 +28,10 @@ router.get('/', authenticateToken, async (req, res) => {
        LEFT JOIN tables tt ON l.target_table_id = tt.id
        LEFT JOIN columns tc ON l.target_column_id = tc.id
        ORDER BY l.created_at DESC 
-       LIMIT ? OFFSET ?`,
+       LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
+    const lineages = lineagesResult.rows;
     
     res.json({
       data: lineages,

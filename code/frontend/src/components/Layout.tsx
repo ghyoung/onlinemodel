@@ -59,6 +59,11 @@ const Layout: React.FC = () => {
       icon: <SettingOutlined />,
       label: '数据治理'
     },
+    ...(user?.role === 'admin' ? [{
+      key: '/user-management',
+      icon: <UserOutlined />,
+      label: '用户管理'
+    }] : []),
     {
       key: '/system',
       icon: <SettingOutlined />,
@@ -74,7 +79,6 @@ const Layout: React.FC = () => {
   // 处理登出
   const handleLogout = () => {
     logout()
-    navigate('/login')
   }
 
   // 用户菜单项
@@ -82,12 +86,20 @@ const Layout: React.FC = () => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: '个人资料'
+      label: '个人资料',
+      onClick: () => navigate('/profile')
     },
+    ...(user?.role === 'admin' ? [{
+      key: 'user-management',
+      icon: <UserOutlined />,
+      label: '用户管理',
+      onClick: () => navigate('/user-management')
+    }] : []),
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: '设置'
+      label: '设置',
+      onClick: () => navigate('/system')
     },
     {
       type: 'divider' as const

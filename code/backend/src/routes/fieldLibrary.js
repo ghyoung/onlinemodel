@@ -25,24 +25,25 @@ router.get('/', authenticateToken, async (req, res) => {
     }
     
     // 获取总数
-    const countResult = await db.get(
+    const countResult = await db.query(
       `SELECT COUNT(*) as total FROM standard_fields ${whereClause}`,
       params
     );
     
-    const total = countResult.total;
+    const total = parseInt(countResult.rows[0].total);
     const offset = (page - 1) * limit;
     
     // 获取字段列表
-    const fields = await db.all(
+    const fieldsResult = await db.query(
       `SELECT sf.*, u.username as created_by_name 
        FROM standard_fields sf 
        LEFT JOIN users u ON sf.created_by = u.id 
        ${whereClause} 
        ORDER BY sf.field_name ASC 
-       LIMIT ? OFFSET ?`,
+       LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
       [...params, limit, offset]
     );
+    const fields = fieldsResult.rows;
     
     res.json({
       data: fields,
@@ -71,10 +72,11 @@ router.post('/', authenticateToken, requireUserOrAdmin, validateField, async (re
     const userId = req.user.userId;
     
     // 检查字段名称是否已存在
-    const existing = await db.get(
-      'SELECT id FROM standard_fields WHERE field_name = ?',
+    const existingResult = await db.query(
+      'SELECT id FROM standard_fields WHERE field_name = $1',
       [field_name]
     );
+    const existing = existingResult.rows[0];
     
     if (existing) {
       return res.status(400).json({
@@ -84,17 +86,12 @@ router.post('/', authenticateToken, requireUserOrAdmin, validateField, async (re
     }
     
     // 创建标准字段
-    const result = await db.run(
+    const result = await db.query(
       `INSERT INTO standard_fields (field_name, field_type, business_meaning, data_standard, data_quality_rule, examples, created_by) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [field_name, field_type, business_meaning, data_standard, data_quality_rule, examples, userId]
     );
-    
-    // 获取新创建的标准字段
-    const newField = await db.get(
-      'SELECT * FROM standard_fields WHERE id = ?',
-      [result.lastID]
-    );
+    const newField = result.rows[0];
     
     res.status(201).json({
       message: '标准字段创建成功',

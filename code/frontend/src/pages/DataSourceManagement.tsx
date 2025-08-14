@@ -31,8 +31,9 @@ import {
   ExclamationCircleOutlined,
   SyncOutlined
 } from '@ant-design/icons'
-import axios from 'axios'
+import api from '@/config/api'
 import { getApiUrl } from '@/config/env'
+import { useAuthStore } from '@/stores/authStore'
 
 const { Option } = Select
 const { TextArea } = Input
@@ -98,18 +99,38 @@ const DataSourceManagement: React.FC = () => {
   const [editingDataSource, setEditingDataSource] = useState<DataSource | null>(null)
   const [form] = Form.useForm()
   const [stats, setStats] = useState<any>({})
+  
+  // 获取认证状态
+  const { isAuthenticated, checkAuth } = useAuthStore()
 
   // 获取数据源列表
   const fetchDataSources = async () => {
     setLoading(true)
     try {
-      const response = await axios.get(getApiUrl('/data-sources'))
+      const response = await api.get('/data-sources')
       if (response.data.success) {
         setDataSources(response.data.data)
+      } else {
+        message.warning('获取数据源列表失败: ' + (response.data.message || '未知错误'))
       }
-    } catch (error) {
-      message.error('获取数据源列表失败')
+    } catch (error: any) {
       console.error('获取数据源列表失败:', error)
+      
+      // 根据错误类型显示不同的提示信息
+      if (error.response?.status === 401) {
+        message.error('认证失败，请重新登录')
+        // 不手动清除本地存储和跳转，让API拦截器统一处理
+      } else if (error.response?.status === 403) {
+        message.error('权限不足，无法访问数据源列表')
+      } else if (error.response?.status === 500) {
+        message.error('服务器内部错误，请稍后重试')
+      } else if (error.code === 'ECONNABORTED') {
+        message.error('请求超时，请检查网络连接')
+      } else if (error.message === 'Network Error') {
+        message.error('网络连接失败，请检查后端服务是否正常运行')
+      } else {
+        message.error('获取数据源列表失败: ' + (error.response?.data?.message || error.message || '未知错误'))
+      }
     } finally {
       setLoading(false)
     }
@@ -118,19 +139,103 @@ const DataSourceManagement: React.FC = () => {
   // 获取统计信息
   const fetchStats = async () => {
     try {
-      const response = await axios.get(getApiUrl('/data-sources/stats'))
+      console.log('🔍 开始获取统计信息...')
+      console.log('📡 API URL:', '/data-sources/stats')
+      
+      // 检查认证令牌
+      const token = localStorage.getItem('auth_token')
+      console.log('🔑 认证令牌状态:', token ? '存在' : '不存在')
+      if (token) {
+        console.log('🔑 令牌前缀:', token.substring(0, 20) + '...')
+      }
+      
+      const response = await api.get('/data-sources/stats')
+      console.log('✅ 统计信息响应:', response.data)
+      
       if (response.data.success) {
         setStats(response.data.data)
+        console.log('📊 统计信息设置成功:', response.data.data)
+      } else {
+        console.error('获取统计信息失败:', response.data.message)
+        message.warning('获取统计信息失败: ' + (response.data.message || '未知错误'))
       }
-    } catch (error) {
-      console.error('获取统计信息失败:', error)
+    } catch (error: any) {
+      console.error('❌ 获取统计信息失败:', error)
+      console.error('❌ 错误详情:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        code: error.code
+      })
+      
+      // 根据错误类型显示不同的提示信息
+      if (error.response?.status === 401) {
+        message.error('认证失败，请重新登录')
+        // 不手动清除本地存储和跳转，让API拦截器统一处理
+      } else if (error.response?.status === 403) {
+        message.error('权限不足，无法访问统计信息')
+      } else if (error.response?.status === 500) {
+        message.error('服务器内部错误，请稍后重试')
+      } else if (error.code === 'ECONNABORTED') {
+        message.error('请求超时，请检查网络连接')
+      } else if (error.message === 'Network Error') {
+        message.error('网络连接失败，请检查后端服务是否正常运行')
+      } else {
+        message.error('获取统计信息失败: ' + (error.response?.data?.message || error.message || '未知错误'))
+      }
     }
   }
 
+  // 检查认证状态
   useEffect(() => {
-    fetchDataSources()
-    fetchStats()
-  }, [])
+    const checkAuthentication = async () => {
+      console.log('🔍 DataSourceManagement - 开始认证检查')
+      console.log('🔍 当前认证状态:', { isAuthenticated })
+      
+      // 检查localStorage中的token
+      const token = localStorage.getItem('auth_token')
+      const userStr = localStorage.getItem('auth_user')
+      console.log('🔍 localStorage检查:', { 
+        hasToken: !!token, 
+        hasUser: !!userStr,
+        tokenPrefix: token ? token.substring(0, 20) + '...' : '无'
+      })
+      
+      // 如果已经认证，直接获取数据
+      if (isAuthenticated && token) {
+        console.log('✅ 用户已认证，开始获取数据')
+        fetchDataSources()
+        fetchStats()
+        return
+      }
+      
+      // 如果未认证但有token，尝试检查认证状态
+      if (!isAuthenticated && token) {
+        console.log('🔍 有token但未认证，尝试检查认证状态...')
+        try {
+          const authResult = await checkAuth()
+          console.log('🔍 认证检查结果:', authResult)
+          if (authResult) {
+            console.log('✅ 认证检查成功，开始获取数据')
+            fetchDataSources()
+            fetchStats()
+          } else {
+            console.log('❌ 认证检查失败，等待路由守卫处理')
+          }
+        } catch (error) {
+          console.error('❌ 认证检查出错:', error)
+        }
+      }
+      
+      // 如果既没有认证也没有token，等待路由守卫处理
+      if (!isAuthenticated && !token) {
+        console.log('❌ 无认证状态且无token，等待路由守卫处理')
+      }
+    }
+    
+    checkAuthentication()
+  }, [isAuthenticated, checkAuth])
 
   // 显示创建/编辑模态框
   const showModal = (dataSource?: DataSource) => {
@@ -138,7 +243,7 @@ const DataSourceManagement: React.FC = () => {
       setEditingDataSource(dataSource)
       form.setFieldsValue({
         name: dataSource.name,
-        description: dataSource.description,
+        description: dataSource.description || '',
         type: dataSource.type,
         host: dataSource.host,
         port: dataSource.port,
@@ -166,14 +271,11 @@ const DataSourceManagement: React.FC = () => {
     try {
       if (editingDataSource) {
         // 更新数据源
-        await axios.put(getApiUrl(`/data-sources/${editingDataSource.id}`), values)
+        await api.put(`/data-sources/${editingDataSource.id}`, values)
         message.success('数据源更新成功')
       } else {
         // 创建数据源
-        await axios.post(getApiUrl('/data-sources'), {
-          ...values,
-          createdBy: 1 // TODO: 从认证状态获取用户ID
-        })
+        await api.post('/data-sources', values)
         message.success('数据源创建成功')
       }
       hideModal()
@@ -188,7 +290,7 @@ const DataSourceManagement: React.FC = () => {
   // 删除数据源
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(getApiUrl(`/data-sources/${id}`))
+      await api.delete(`/data-sources/${id}`)
       message.success('数据源删除成功')
       fetchDataSources()
       fetchStats()
@@ -201,7 +303,7 @@ const DataSourceManagement: React.FC = () => {
   // 测试连接
   const handleTestConnection = async (id: number) => {
     try {
-      await axios.post(getApiUrl(`/data-sources/${id}/test`))
+      await api.post(`/data-sources/${id}/test`)
       message.success('连接测试成功')
       fetchDataSources()
     } catch (error: any) {
@@ -213,7 +315,7 @@ const DataSourceManagement: React.FC = () => {
   // 切换启用状态
   const handleToggleStatus = async (id: number, enabled: boolean) => {
     try {
-      await axios.put(`http://localhost:8080/api/data-sources/${id}/toggle?enabled=${enabled}`)
+      await api.put(`/data-sources/${id}/toggle?enabled=${enabled}`)
       message.success(`数据源已${enabled ? '启用' : '禁用'}`)
       fetchDataSources()
     } catch (error: any) {

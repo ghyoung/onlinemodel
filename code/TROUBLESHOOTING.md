@@ -175,3 +175,199 @@ psql -h localhost -U postgres -d lakehouse
 - **2024-01-XX**: 修复SystemSettings页面缺失问题
 - **2024-01-XX**: 修复后端配置文件缺失问题
 - **2024-01-XX**: 创建修复版启动脚本
+
+# 数据源管理模块故障排除指南
+
+## 问题：获取统计信息失败
+
+### 症状
+- 进入数据源管理模块时显示 toast 提示："获取统计信息失败"
+- 统计卡片显示为 0 或空白
+- 控制台显示相关错误信息
+
+### 可能原因及解决方案
+
+#### 1. 认证问题
+
+**症状：**
+- 控制台显示 401 错误
+- 用户被重定向到登录页
+
+**解决方案：**
+1. 检查用户是否已登录
+2. 清除浏览器本地存储并重新登录
+3. 检查认证令牌是否过期
+
+**验证步骤：**
+```bash
+# 检查本地存储
+localStorage.getItem('auth_token')
+localStorage.getItem('auth_user')
+```
+
+#### 2. 后端服务问题
+
+**症状：**
+- 控制台显示 500 错误
+- 网络连接失败
+- 后端服务无响应
+
+**解决方案：**
+1. 检查后端服务是否正常运行
+2. 验证数据库连接
+3. 检查后端日志
+
+**验证步骤：**
+```bash
+# 检查后端服务状态
+curl http://localhost:3000/health
+
+# 检查后端日志
+tail -f backend/logs/app.log
+```
+
+#### 3. 数据库问题
+
+**症状：**
+- 后端日志显示数据库连接错误
+- 统计查询失败
+
+**解决方案：**
+1. 检查 PostgreSQL 服务状态
+2. 验证数据库连接配置
+3. 检查数据表是否存在
+
+**验证步骤：**
+```bash
+# 检查数据库连接
+psql -h localhost -p 5433 -U lakehouse_user -d lakehouse_modeling
+
+# 检查数据表
+\dt data_sources
+```
+
+#### 4. 网络/代理问题
+
+**症状：**
+- 前端无法连接到后端
+- 代理配置错误
+- CORS 错误
+
+**解决方案：**
+1. 检查 Vite 代理配置
+2. 验证后端 CORS 设置
+3. 检查防火墙设置
+
+**验证步骤：**
+```bash
+# 测试 API 连接
+curl http://localhost:3000/api/data-sources/stats
+
+# 检查代理配置
+cat frontend/vite.config.ts
+```
+
+#### 5. 内容安全策略（CSP）错误
+
+**症状：**
+- 控制台显示 CSP 错误：`Refused to connect to 'http://localhost:3001/api/data-sources' because it violates the following Content Security Policy directive: "connect-src 'self' ws: wss:"`
+- 前端试图连接到错误的端口或绝对路径
+
+**解决方案：**
+1. 确保前端使用相对路径 `/api` 而不是绝对路径
+2. 检查 Vite 代理配置是否正确
+3. 验证端口配置一致性
+
+**验证步骤：**
+```bash
+# 运行配置检查脚本（在项目根目录）
+npm run check-config
+
+# 或者在项目根目录直接运行
+node check-config-simple.js
+
+# 检查前端配置文件
+cat frontend/src/config/env.ts
+cat frontend/src/config/api.ts
+cat frontend/vite.config.ts
+```
+
+**配置要求：**
+- 前端端口：3002
+- 后端端口：3000
+- 前端使用相对路径：`/api`
+- Vite 代理目标：`http://localhost:3000`
+
+### 调试步骤
+
+#### 步骤 1：检查前端控制台
+1. 打开浏览器开发者工具
+2. 查看 Console 标签页
+3. 查找错误信息和调试日志
+
+#### 步骤 2：检查网络请求
+1. 打开 Network 标签页
+2. 刷新页面
+3. 查看 `/data-sources/stats` 请求的状态
+
+#### 步骤 3：运行配置检查
+```bash
+# 在项目根目录运行
+npm run check-config
+
+# 或者直接运行
+node check-config-simple.js
+```
+
+#### 步骤 4：运行 API 测试
+```bash
+cd backend
+npm run test-api
+```
+
+#### 步骤 5：检查后端日志
+```bash
+cd backend
+npm run dev
+# 查看控制台输出
+```
+
+### 常见错误代码
+
+| 错误代码 | 含义 | 解决方案 |
+|---------|------|----------|
+| 401 | 未授权 | 重新登录，检查认证令牌 |
+| 403 | 禁止访问 | 检查用户权限 |
+| 500 | 服务器内部错误 | 检查后端日志，验证数据库 |
+| 503 | 服务不可用 | 检查数据库连接 |
+| ECONNABORTED | 请求超时 | 检查网络连接，增加超时时间 |
+| Network Error | 网络错误 | 检查后端服务状态 |
+| CSP Error | 内容安全策略错误 | 检查API路径配置，确保使用相对路径 |
+
+### 预防措施
+
+1. **定期检查服务状态**
+   - 监控后端服务运行状态
+   - 检查数据库连接健康状态
+
+2. **完善错误处理**
+   - 前端显示友好的错误信息
+   - 后端记录详细的错误日志
+
+3. **用户引导**
+   - 提供清晰的错误提示
+   - 引导用户进行故障排除
+
+4. **配置一致性**
+   - 定期运行配置检查脚本
+   - 确保前后端配置匹配
+
+### 联系支持
+
+如果问题仍然存在，请提供以下信息：
+1. 错误截图
+2. 控制台日志
+3. 后端日志
+4. 环境信息（操作系统、Node.js 版本等）
+5. 重现步骤
+6. 配置检查脚本的输出结果

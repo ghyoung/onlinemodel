@@ -33,7 +33,7 @@ import {
 
 const { Search } = Input
 const { Option } = Select
-const { TabPane } = Tabs
+
 
 interface GovernanceRule {
   id: number
@@ -500,6 +500,129 @@ const DataGovernance: React.FC = () => {
       rules.reduce((sum, rule) => sum + rule.successRate, 0) / rules.length : 0
   }
 
+  // 定义 Tabs 的 items
+  const tabItems = [
+    {
+      key: 'rules',
+      label: '治理规则',
+      children: (
+        <>
+          {/* 搜索和筛选 */}
+          <Card style={{ marginBottom: 16 }}>
+            <Space wrap style={{ width: '100%' }}>
+              <Search
+                placeholder="搜索规则名称..."
+                style={{ width: 300 }}
+                onSearch={handleSearch}
+                enterButton={<SearchOutlined />}
+              />
+              <Select
+                placeholder="选择规则类型"
+                style={{ width: 150 }}
+                allowClear
+                value={selectedType}
+                onChange={setSelectedType}
+              >
+                {ruleTypeOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                placeholder="选择规则状态"
+                style={{ width: 150 }}
+                allowClear
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+              >
+                {ruleStatusOptions.map(option => (
+                  <Option key={option.value} value={option.value}>
+                    {option.label}
+                  </Option>
+                ))}
+              </Select>
+            </Space>
+          </Card>
+
+          {/* 规则列表 */}
+          <Table
+            columns={ruleColumns}
+            dataSource={rules}
+            rowKey="id"
+            loading={loading}
+            scroll={{ x: 1200 }}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => 
+                `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+              pageSize: 10,
+              pageSizeOptions: ['10', '20', '50', '100']
+            }}
+          />
+        </>
+      )
+    },
+    {
+      key: 'results',
+      label: '治理结果',
+      children: (
+        <>
+          {/* 结果统计 */}
+          <Row gutter={16} style={{ marginBottom: 16 }}>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="待处理问题"
+                  value={governanceStats.openIssues}
+                  valueStyle={{ color: '#FAAD14' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="已处理问题"
+                  value={governanceStats.totalIssues - governanceStats.openIssues}
+                  valueStyle={{ color: '#52C41A' }}
+                />
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card>
+                <Statistic
+                  title="处理率"
+                  value={governanceStats.totalIssues > 0 ? 
+                    ((governanceStats.totalIssues - governanceStats.openIssues) / governanceStats.totalIssues * 100).toFixed(1) : 0}
+                  suffix="%"
+                  valueStyle={{ color: '#1890FF' }}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* 结果列表 */}
+          <Table
+            columns={resultColumns}
+            dataSource={results}
+            rowKey="id"
+            loading={loading}
+            scroll={{ x: 1400 }}
+            pagination={{
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => 
+                `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+              pageSize: 10,
+              pageSizeOptions: ['10', '20', '50', '100']
+            }}
+          />
+        </>
+      )
+    }
+  ]
+
   return (
     <div>
       <div style={{ 
@@ -581,116 +704,7 @@ const DataGovernance: React.FC = () => {
       </Row>
 
       {/* 治理规则和结果 */}
-      <Tabs defaultActiveKey="rules">
-        <TabPane tab="治理规则" key="rules">
-          {/* 搜索和筛选 */}
-          <Card style={{ marginBottom: 16 }}>
-            <Space wrap style={{ width: '100%' }}>
-              <Search
-                placeholder="搜索规则名称..."
-                style={{ width: 300 }}
-                onSearch={handleSearch}
-                enterButton={<SearchOutlined />}
-              />
-              <Select
-                placeholder="选择规则类型"
-                style={{ width: 150 }}
-                allowClear
-                value={selectedType}
-                onChange={setSelectedType}
-              >
-                {ruleTypeOptions.map(option => (
-                  <Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Option>
-                ))}
-              </Select>
-              <Select
-                placeholder="选择规则状态"
-                style={{ width: 150 }}
-                allowClear
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-              >
-                {ruleStatusOptions.map(option => (
-                  <Option key={option.value} value={option.value}>
-                    {option.label}
-                  </Option>
-                ))}
-              </Select>
-            </Space>
-          </Card>
-
-          {/* 规则列表 */}
-          <Table
-            columns={ruleColumns}
-            dataSource={rules}
-            rowKey="id"
-            loading={loading}
-            scroll={{ x: 1200 }}
-            pagination={{
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => 
-                `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-              pageSize: 10,
-              pageSizeOptions: ['10', '20', '50', '100']
-            }}
-          />
-        </TabPane>
-
-        <TabPane tab="治理结果" key="results">
-          {/* 结果统计 */}
-          <Row gutter={16} style={{ marginBottom: 16 }}>
-            <Col span={8}>
-              <Card>
-                <Statistic
-                  title="待处理问题"
-                  value={governanceStats.openIssues}
-                  valueStyle={{ color: '#FAAD14' }}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card>
-                <Statistic
-                  title="已处理问题"
-                  value={governanceStats.totalIssues - governanceStats.openIssues}
-                  valueStyle={{ color: '#52C41A' }}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card>
-                <Statistic
-                  title="处理率"
-                  value={governanceStats.totalIssues > 0 ? 
-                    ((governanceStats.totalIssues - governanceStats.openIssues) / governanceStats.totalIssues * 100).toFixed(1) : 0}
-                  suffix="%"
-                  valueStyle={{ color: '#1890FF' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-
-          {/* 结果列表 */}
-          <Table
-            columns={resultColumns}
-            dataSource={results}
-            rowKey="id"
-            loading={loading}
-            scroll={{ x: 1400 }}
-            pagination={{
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: (total, range) => 
-                `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
-              pageSize: 10,
-              pageSizeOptions: ['10', '20', '50', '100']
-            }}
-          />
-        </TabPane>
-      </Tabs>
+      <Tabs defaultActiveKey="rules" items={tabItems} />
 
       {/* 添加/编辑规则模态框 */}
       <Modal

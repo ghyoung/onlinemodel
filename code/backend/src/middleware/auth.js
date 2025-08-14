@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { envConfig } from '../../env.config.js';
 
 // JWT认证中间件
 export function authenticateToken(req, res, next) {
@@ -13,7 +14,7 @@ export function authenticateToken(req, res, next) {
   }
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, envConfig.JWT_SECRET || 'your-secret-key');
     req.user = decoded;
     next();
   } catch (error) {

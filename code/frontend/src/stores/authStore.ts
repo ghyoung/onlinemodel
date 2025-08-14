@@ -1,17 +1,17 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import axios from 'axios'
+import api from '@/config/api'
 
 // 用户信息接口
 export interface User {
   id: number
   username: string
   email: string
-  realName?: string
-  role: 'ADMIN' | 'USER' | 'GUEST'
-  status: 'ACTIVE' | 'INACTIVE' | 'LOCKED' | 'SUSPENDED'
-  avatar?: string
-  lastLoginAt: string
+  role: 'admin' | 'user'
+  status: 'active' | 'inactive' | 'locked' | 'deleted'
+  created_at: string
+  updated_at: string
+  last_login_at?: string
 }
 
 // 登录请求接口
@@ -25,7 +25,7 @@ export interface RegisterRequest {
   username: string
   password: string
   email: string
-  realName?: string
+  role?: 'admin' | 'user'
 }
 
 // 认证状态接口
@@ -51,46 +51,6 @@ interface AuthState {
   checkEmail: (email: string) => Promise<boolean>
 }
 
-// API基础URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
-
-// 创建axios实例
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-
-// 请求拦截器：添加token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
-
-// 响应拦截器：处理token过期
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token过期，清除本地存储
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('auth_user')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -110,13 +70,16 @@ export const useAuthStore = create<AuthState>()(
           
           if (response.data.success) {
             const userData = response.data.data
+            const token = response.data.token
             
-            // 保存用户信息到本地存储
+            // 保存用户信息和token到本地存储
+            localStorage.setItem('auth_token', token)
             localStorage.setItem('auth_user', JSON.stringify(userData))
             
             set({
               isAuthenticated: true,
               user: userData,
+              token: token,
               isLoading: false,
               error: null,
             })
@@ -189,9 +152,11 @@ export const useAuthStore = create<AuthState>()(
 
       // 检查认证状态
       checkAuth: async (): Promise<boolean> => {
+        const token = localStorage.getItem('auth_token')
         const userStr = localStorage.getItem('auth_user')
-        if (!userStr) {
-          set({ isAuthenticated: false, user: null })
+        
+        if (!token || !userStr) {
+          set({ isAuthenticated: false, user: null, token: null })
           return false
         }
 
@@ -199,7 +164,7 @@ export const useAuthStore = create<AuthState>()(
           const user = JSON.parse(userStr)
           
           // 验证用户信息
-          const response = await api.get(`/auth/profile?userId=${user.id}`)
+          const response = await api.get('/auth/me')
           
           if (response.data.success) {
             const updatedUser = response.data.data
@@ -210,26 +175,29 @@ export const useAuthStore = create<AuthState>()(
             set({
               isAuthenticated: true,
               user: updatedUser,
+              token: token,
               error: null,
             })
             
             return true
           } else {
-            // 用户信息无效，清除本地存储
-            localStorage.removeItem('auth_user')
+            // 用户信息无效，但不立即清除本地存储，让API拦截器处理
+            console.log('用户信息验证失败:', response.data.message)
             set({
               isAuthenticated: false,
               user: null,
+              token: null,
               error: response.data.message,
             })
             return false
           }
         } catch (error: any) {
-          // 发生错误，清除本地存储
-          localStorage.removeItem('auth_user')
+          // 发生错误，但不立即清除本地存储，让API拦截器处理
+          console.log('认证检查出错:', error.message)
           set({
             isAuthenticated: false,
             user: null,
+            token: null,
             error: error.message || '认证检查失败',
           })
           return false
@@ -276,6 +244,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         user: state.user,
+        token: state.token,
       }),
     }
   )
@@ -283,16 +252,21 @@ export const useAuthStore = create<AuthState>()(
 
 // 初始化时检查认证状态
 if (typeof window !== 'undefined') {
+  const token = localStorage.getItem('auth_token')
   const userStr = localStorage.getItem('auth_user')
-  if (userStr) {
+  
+  if (token && userStr) {
     try {
       const user = JSON.parse(userStr)
+      // 只在初始化时设置状态，不触发重新渲染
       useAuthStore.setState({
         isAuthenticated: true,
         user: user,
+        token: token,
       })
     } catch (error) {
       console.error('解析用户信息失败:', error)
+      localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_user')
     }
   }

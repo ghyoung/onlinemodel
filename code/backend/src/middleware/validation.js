@@ -42,18 +42,36 @@ const dataSourceSchema = Joi.object({
     'string.max': '数据源名称不能超过100个字符',
     'any.required': '数据源名称不能为空'
   }),
-  type: Joi.string().valid('mysql', 'postgresql', 'oracle', 'sqlserver', 'hive', 'clickhouse').required().messages({
+  description: Joi.string().max(500).optional().messages({
+    'string.max': '描述不能超过500个字符'
+  }),
+  type: Joi.string().valid('MYSQL', 'POSTGRESQL', 'ORACLE', 'SQLSERVER', 'HIVE', 'CLICKHOUSE', 'DB2', 'SNOWFLAKE').required().messages({
     'any.only': '不支持的数据源类型',
     'any.required': '数据源类型不能为空'
   }),
-  connection_info: Joi.object({
-    host: Joi.string().required(),
-    port: Joi.number().integer().min(1).max(65535).required(),
-    database: Joi.string().required(),
-    username: Joi.string().required(),
-    password: Joi.string().required()
-  }).required().messages({
-    'any.required': '连接信息不能为空'
+  host: Joi.string().required().messages({
+    'any.required': '主机地址不能为空'
+  }),
+  port: Joi.number().integer().min(1).max(65535).required().messages({
+    'any.required': '端口号不能为空',
+    'number.min': '端口号必须大于0',
+    'number.max': '端口号不能超过65535'
+  }),
+  database: Joi.string().required().messages({
+    'any.required': '数据库名不能为空'
+  }),
+  username: Joi.string().required().messages({
+    'any.required': '用户名不能为空'
+  }),
+  password: Joi.string().when('$isEdit', {
+    is: true,
+    then: Joi.optional(),
+    otherwise: Joi.required()
+  }).messages({
+    'any.required': '密码不能为空'
+  }),
+  connectionParams: Joi.string().max(1000).optional().messages({
+    'string.max': '连接参数不能超过1000个字符'
   })
 });
 
@@ -96,7 +114,12 @@ const fieldSchema = Joi.object({
 // 验证中间件工厂函数
 function validate(schema) {
   return (req, res, next) => {
-    const { error, value } = schema.validate(req.body);
+    // 检查是否为编辑模式
+    const isEdit = req.method === 'PUT' || req.method === 'PATCH';
+    
+    const { error, value } = schema.validate(req.body, {
+      context: { isEdit }
+    });
     
     if (error) {
       return res.status(400).json({

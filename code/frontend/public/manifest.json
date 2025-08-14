@@ -1,0 +1,16 @@
+{
+  "name": "湖仓建模工具",
+  "short_name": "湖仓建模",
+  "description": "一站式湖仓建模平台",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1890FF",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

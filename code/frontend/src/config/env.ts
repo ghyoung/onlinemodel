@@ -1,7 +1,9 @@
+/// <reference types="vite/client" />
+
 // 环境配置
 export const config = {
-  // API基础URL
-  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  // API基础URL - 使用相对路径，通过Vite代理转发到后端
+  API_BASE_URL: import.meta.env.VITE_API_BASE_URL || '/api',
   
   // 应用信息
   APP_TITLE: import.meta.env.VITE_APP_TITLE || '湖仓建模工具',

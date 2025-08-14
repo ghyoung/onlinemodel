@@ -8,7 +8,10 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "test": "echo 'No tests yet'",
-    "build": "echo 'No build step needed for Node.js'"
+    "test-api": "node test-api.js",
+    "check-config": "node ../check-config.js",
+    "build": "echo 'No build step needed for Node.js'",
+    "fix-db": "node src/database/fix-database.js"
   },
   "keywords": [
     "lakehouse",

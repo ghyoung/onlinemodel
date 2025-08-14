@@ -1,0 +1,24 @@
+{
+  "name": "lakehouse-modeling",
+  "version": "1.0.0",
+  "description": "湖仓建模工具 - 一站式湖仓建模平台",
+  "scripts": {
+    "start": "echo '请使用 start-dev.bat 或 start-dev.sh 启动开发环境'",
+    "dev": "echo '请使用 start-dev.bat 或 start-dev.sh 启动开发环境'",
+    "check-config": "node check-config-simple.js",
+    "test-api": "cd backend && npm run test-api",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": [
+    "lakehouse",
+    "data-modeling",
+    "data-governance",
+    "lineage"
+  ],
+  "author": "Lakehouse Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

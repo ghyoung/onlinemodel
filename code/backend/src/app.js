@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
 import dotenv from 'dotenv';
+import { envConfig } from '../env.config.js';
 
 // 导入路由
 import authRoutes from './routes/auth.js';
@@ -25,12 +26,12 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
-const port = process.env.PORT || 3000;
+const port = envConfig.PORT || 3000;
 
 // 中间件
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: envConfig.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 app.use(morgan('combined'));
@@ -44,6 +45,24 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// 根路径API信息
+app.get('/api', (req, res) => {
+  res.json({
+    name: '湖仓建模工具API',
+    version: '1.0.0',
+    description: '一站式湖仓建模平台后端API服务',
+    endpoints: {
+      auth: '/api/auth',
+      dataSources: '/api/data-sources',
+      models: '/api/models',
+      fieldLibrary: '/api/field-library',
+      lineage: '/api/lineage',
+      ddl: '/api/ddl'
+    },
+    timestamp: new Date().toISOString()
   });
 });
 

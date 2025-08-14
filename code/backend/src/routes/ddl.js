@@ -14,29 +14,31 @@ router.get('/', authenticateToken, async (req, res) => {
     const params = [];
     
     if (status) {
-      whereClause += ' AND import_status = ?';
+      whereClause += ' AND import_status = $' + (params.length + 1);
       params.push(status);
     }
     
     // 获取总数
-    const countResult = await db.get(
+    const countResult = await db.query(
       `SELECT COUNT(*) as total FROM ddl_imports ${whereClause}`,
       params
     );
     
-    const total = countResult.total;
+    const total = parseInt(countResult.rows[0].total);
     const offset = (page - 1) * limit;
     
     // 获取DDL导入记录列表
-    const imports = await db.all(
+    const importsResult = await db.query(
       `SELECT di.*, u.username as created_by_name 
        FROM ddl_imports di 
        LEFT JOIN users u ON di.created_by = u.id 
        ${whereClause} 
        ORDER BY di.created_at DESC 
-       LIMIT ? OFFSET ?`,
+       LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
       [...params, limit, offset]
     );
+    
+    const imports = importsResult.rows;
     
     res.json({
       data: imports,
@@ -73,9 +75,8 @@ router.post('/import', authenticateToken, requireUserOrAdmin, async (req, res) =
     const db = getDatabase();
     
     // 创建导入记录
-    const result = await db.run(
-      `INSERT INTO ddl_imports (file_name, file_size, import_status, created_by) 
-       VALUES (?, ?, ?, ?)`,
+    const result = await db.query(
+      'INSERT INTO ddl_imports (file_name, file_size, import_status, created_by) VALUES ($1, $2, $3, $4) RETURNING *',
       [file_name || 'manual_input.sql', file_size || ddl_content.length, 'processing', userId]
     );
     
@@ -83,18 +84,14 @@ router.post('/import', authenticateToken, requireUserOrAdmin, async (req, res) =
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // 更新导入状态
-    await db.run(
-      `UPDATE ddl_imports 
-       SET import_status = ?, parsed_tables = ?, parsed_columns = ?, updated_at = ? 
-       WHERE id = ?`,
-      ['completed', Math.floor(Math.random() * 10) + 1, Math.floor(Math.random() * 50) + 5, new Date().toISOString(), result.lastID]
+    await db.query(
+      'UPDATE ddl_imports SET import_status = $1, parsed_tables = $2, parsed_columns = $3, updated_at = $4 WHERE id = $5',
+      ['completed', Math.floor(Math.random() * 10) + 1, Math.floor(Math.random() * 50) + 5, new Date().toISOString(), result.rows[0].id]
     );
     
     // 获取更新后的记录
-    const importRecord = await db.get(
-      'SELECT * FROM ddl_imports WHERE id = ?',
-      [result.lastID]
-    );
+    const importRecordResult = await db.query('SELECT * FROM ddl_imports WHERE id = $1', [result.rows[0].id]);
+    const importRecord = importRecordResult.rows[0];
     
     res.json({
       message: 'DDL导入成功',

@@ -1,6 +1,7 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import { envConfig } from '../../env.config.js';
 
 dotenv.config();
 
@@ -14,11 +15,11 @@ export async function initDatabase() {
   try {
     // 创建连接池
     pool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: process.env.DB_PORT || 5433,
-      database: process.env.DB_NAME || 'lakehouse_modeling',
-      user: process.env.DB_USERNAME || 'lakehouse_user',
-      password: process.env.DB_PASSWORD || 'lakehouse_pass',
+      host: envConfig.DB_HOST || 'localhost',
+      port: envConfig.DB_PORT || 5433,
+      database: envConfig.DB_NAME || 'lakehouse_modeling',
+      user: envConfig.DB_USERNAME || 'lakehouse_user',
+      password: envConfig.DB_PASSWORD || 'lakehouse_pass',
       max: 20, // 最大连接数
       idleTimeoutMillis: 30000, // 连接空闲超时
       connectionTimeoutMillis: 2000, // 连接超时
@@ -65,6 +66,7 @@ async function createTables() {
         password_hash VARCHAR(255) NOT NULL,
         role VARCHAR(20) DEFAULT 'user',
         status VARCHAR(20) DEFAULT 'active',
+        last_login_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
@@ -75,9 +77,12 @@ async function createTables() {
       CREATE TABLE IF NOT EXISTS data_sources (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
+        description TEXT,
         type VARCHAR(50) NOT NULL,
         connection_info JSONB NOT NULL,
         status VARCHAR(20) DEFAULT 'active',
+        last_test_at TIMESTAMP,
+        last_sync_at TIMESTAMP,
         created_by INTEGER REFERENCES users(id),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
