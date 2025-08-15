@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "湖仓建模工具 - 一站式湖仓建模平台",
   "scripts": {
-    "start": "echo '请使用 start-dev.bat 或 start-dev.sh 启动开发环境'",
-    "dev": "echo '请使用 start-dev.bat 或 start-dev.sh 启动开发环境'",
-    "check-config": "node check-config-simple.js",
+    "start": "echo '请使用根目录的 start-dev.bat 或 start-dev.sh 启动开发环境'",
+    "dev": "echo '请使用根目录的 start-dev.bat 或 start-dev.sh 启动开发环境'",
+    "check-config": "node init-scripts/check-config-simple.js",
+    "check-config-full": "node init-scripts/check-config.js",
     "test-api": "cd backend && npm run test-api",
+    "test-db": "cd backend && node test-db-connection.js",
+    "fix-db": "cd backend && node fix-database.js",
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "keywords": [

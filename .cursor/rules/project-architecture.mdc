@@ -1,0 +1,68 @@
+## 项目架构和通用开发规范
+
+### 项目概述
+- 项目名称：湖仓建模工具 (Lakehouse Modeling Tool)
+- 架构：前后端分离，微服务架构
+- 技术栈：React + TypeScript + Node.js + PostgreSQL
+- 目标：一站式湖仓建模平台
+
+### 目录结构规范
+```
+code/
+├── backend/          # 后端服务
+├── frontend/         # 前端应用
+├── init-scripts/     # 初始化脚本
+└── 配置文件
+```
+
+### 命名规范
+- 文件名：kebab-case (如：data-source-management.tsx)
+- 组件名：PascalCase (如：DataSourceManagement)
+- 函数名：camelCase (如：getDataSourceList)
+- 常量：UPPER_SNAKE_CASE (如：API_BASE_URL)
+- 数据库表：snake_case (如：data_sources)
+
+### 代码质量要求
+- 所有代码必须有注释说明
+- 函数和类必须有 JSDoc 注释
+- 错误处理必须完整
+- 代码必须通过 ESLint 检查
+- TypeScript 严格模式开启
+
+### 版本控制规范
+- 使用语义化版本号
+- 提交信息使用中文描述
+- 分支命名：feature/功能名、bugfix/问题描述
+- 重要功能需要代码审查
+
+### 环境配置
+- 使用 .env 文件管理环境变量
+- 不同环境使用不同配置文件
+- 敏感信息不提交到版本控制
+- 配置验证在启动时进行
+
+### 文档规范
+- **所有项目文档必须保存在项目根目录的 `doc/` 路径下**
+- 调整了代码后，一定要检查是否改动了需求，若改动了，需要调整对应的所有文档
+- 每个模块必须有 README 说明
+- API 接口必须有文档
+- 数据库设计必须有 ER 图
+- 部署流程必须有详细说明
+- 禁止在代码目录中创建文档文件
+
+### 性能要求
+- 页面加载时间 < 3秒
+- API 响应时间 < 500ms
+- 数据库查询优化
+- 前端资源压缩和缓存
+
+### 安全要求
+- 用户认证和授权
+- 数据加密传输
+- SQL 注入防护
+- XSS 攻击防护
+- CSRF 攻击防护
+description:
+globs:
+alwaysApply: true
+---

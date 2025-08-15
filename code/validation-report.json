@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-08-15T02:38:06.602Z",
+  "summary": {
+    "success": 5,
+    "warnings": 14,
+    "errors": 23
+  },
+  "details": {
+    "success": [
+      "[2025-08-15T02:38:06.541Z] SUCCESS: 环境配置验证完成",
+      "[2025-08-15T02:38:06.569Z] SUCCESS: 数据库连接成功",
+      "[2025-08-15T02:38:06.600Z] SUCCESS: 数据库结构验证完成",
+      "[2025-08-15T02:38:06.601Z] SUCCESS: 后端API验证完成",
+      "[2025-08-15T02:38:06.601Z] SUCCESS: 前端结构验证完成"
+    ],
+    "warnings": [
+      "[2025-08-15T02:38:06.588Z] WARNING: 表 data_sources 列 created_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.588Z] WARNING: 表 data_sources 列 updated_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.588Z] WARNING: 表 data_sources 列 last_test_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.588Z] WARNING: 表 data_sources 列 last_sync_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.593Z] WARNING: 表 models 列 created_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.594Z] WARNING: 表 models 列 updated_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.600Z] WARNING: 表 users 列 created_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.600Z] WARNING: 表 users 列 updated_at 类型不匹配: 期望 timestamp, 实际 timestamp without time zone",
+      "[2025-08-15T02:38:06.600Z] WARNING: 控制器文件缺失: src/controllers/authController.js",
+      "[2025-08-15T02:38:06.601Z] WARNING: 控制器文件缺失: src/controllers/dataSourceController.js",
+      "[2025-08-15T02:38:06.601Z] WARNING: 控制器文件缺失: src/controllers/modelController.js",
+      "[2025-08-15T02:38:06.601Z] WARNING: 配置文件缺失: src/config/api.ts",
+      "[2025-08-15T02:38:06.601Z] WARNING: 配置文件缺失: src/config/env.ts",
+      "[2025-08-15T02:38:06.601Z] WARNING: 配置文件缺失: src/stores/authStore.ts"
+    ],
+    "errors": [
+      "[2025-08-15T02:38:06.541Z] ERROR: 环境配置文件缺失: ../backend/env.config.js",
+      "[2025-08-15T02:38:06.541Z] ERROR: 环境配置文件缺失: ../frontend/env.config.js",
+      "[2025-08-15T02:38:06.541Z] ERROR: package.json缺失: ../backend/package.json",
+      "[2025-08-15T02:38:06.541Z] ERROR: package.json缺失: ../frontend/package.json",
+      "[2025-08-15T02:38:06.588Z] ERROR: 表 data_sources 缺少列: connection_string",
+      "[2025-08-15T02:38:06.593Z] ERROR: 表 models 缺少列: data_source_id",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/auth.js",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/dataSource.js",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/model.js",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/fieldLibrary.js",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/lineage.js",
+      "[2025-08-15T02:38:06.600Z] ERROR: 路由文件缺失: src/routes/ddl.js",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/Dashboard.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/DataSourceManagement.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/ModelManagement.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/OnlineModeling.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/FieldLibrary.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/Lineage.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/DDLImport.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/DataGovernance.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/UserManagement.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 页面组件缺失: src/pages/SystemSettings.tsx",
+      "[2025-08-15T02:38:06.601Z] ERROR: 🚨 系统存在不一致问题，请修复后重新校验"
+    ]
+  }
+}

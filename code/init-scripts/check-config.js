@@ -13,9 +13,9 @@ console.log('📍 脚本运行目录:', currentDir);
 // 检查前端配置
 console.log('📱 前端配置检查:');
 try {
-  const viteConfig = fs.readFileSync(path.join(currentDir, 'frontend', 'vite.config.ts'), 'utf8');
-  const envConfig = fs.readFileSync(path.join(currentDir, 'frontend', 'src', 'config', 'env.ts'), 'utf8');
-  const apiConfig = fs.readFileSync(path.join(currentDir, 'frontend', 'src', 'config', 'api.ts'), 'utf8');
+  const viteConfig = fs.readFileSync(path.join(currentDir, '..', 'frontend', 'vite.config.ts'), 'utf8');
+  const envConfig = fs.readFileSync(path.join(currentDir, '..', 'frontend', 'src', 'config', 'env.ts'), 'utf8');
+  const apiConfig = fs.readFileSync(path.join(currentDir, '..', 'frontend', 'src', 'config', 'api.ts'), 'utf8');
   
   // 检查Vite端口
   const portMatch = viteConfig.match(/port:\s*(\d+)/);
@@ -55,7 +55,7 @@ try {
 
 console.log('\n🔧 后端配置检查:');
 try {
-  const backendConfig = fs.readFileSync(path.join(currentDir, 'backend', 'env.config.js'), 'utf8');
+  const backendConfig = fs.readFileSync(path.join(currentDir, '..', 'backend', 'env.config.js'), 'utf8');
   
   // 检查后端端口
   const portMatch = backendConfig.match(/PORT:\s*(\d+)/);
@@ -79,8 +79,8 @@ try {
 
 console.log('\n📋 配置一致性检查:');
 try {
-  const viteConfig = fs.readFileSync(path.join(currentDir, 'frontend', 'vite.config.ts'), 'utf8');
-  const backendConfig = fs.readFileSync(path.join(currentDir, 'backend', 'env.config.js'), 'utf8');
+  const viteConfig = fs.readFileSync(path.join(currentDir, '..', 'frontend', 'vite.config.ts'), 'utf8');
+  const backendConfig = fs.readFileSync(path.join(currentDir, '..', 'backend', 'env.config.js'), 'utf8');
   
   // 检查端口一致性
   const vitePortMatch = viteConfig.match(/port:\s*(\d+)/);
@@ -99,19 +99,44 @@ try {
     if (proxyTarget.includes(`localhost:${backendPort}`)) {
       console.log('  ✅ 代理配置正确');
     } else {
-      console.log('  ❌ 代理配置错误：代理目标与后端端口不匹配');
+      console.log('  ❌ 代理配置错误：前端代理目标与后端端口不匹配');
     }
+  } else {
+    console.log('  ❌ 无法完成端口一致性检查');
   }
   
 } catch (error) {
   console.log(`  ❌ 配置一致性检查失败: ${error.message}`);
 }
 
-console.log('\n🎯 建议配置:');
-console.log('  前端端口: 3002');
-console.log('  后端端口: 3000');
-console.log('  代理目标: http://localhost:3000');
-console.log('  API基础URL: /api');
-console.log('  前端URL (CORS): http://localhost:3002');
+console.log('\n📁 目录结构检查:');
+const requiredDirs = ['frontend', 'backend', 'frontend/src', 'frontend/src/components', 'frontend/src/pages', 'backend/src', 'backend/src/routes', 'backend/src/controllers'];
+requiredDirs.forEach(dir => {
+  const fullPath = path.join(currentDir, '..', dir);
+  if (fs.existsSync(fullPath)) {
+    console.log(`  ✅ ${dir}/`);
+  } else {
+    console.log(`  ❌ ${dir}/ (目录不存在)`);
+  }
+});
+
+console.log('\n🔍 配置文件检查:');
+const requiredFiles = [
+  'frontend/package.json',
+  'frontend/vite.config.ts',
+  'frontend/tsconfig.json',
+  'backend/package.json',
+  'backend/env.config.js'
+];
+
+requiredFiles.forEach(file => {
+  const fullPath = path.join(currentDir, '..', file);
+  if (fs.existsSync(fullPath)) {
+    console.log(`  ✅ ${file}`);
+  } else {
+    console.log(`  ❌ ${file} (文件不存在)`);
+  }
+});
 
 console.log('\n✨ 配置检查完成！');
+console.log('�� 如有问题，请参考故障排除指南');

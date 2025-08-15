@@ -1,0 +1,48 @@
+## 前端React开发规范
+
+### 项目结构
+- 使用 TypeScript 进行开发，严格类型检查
+- 遵循 `src/` 目录结构，使用 `@/*` 路径别名
+- 组件放在 `src/components/` 目录
+- 页面放在 `src/pages/` 目录
+- 状态管理使用 Zustand
+- UI组件库使用 Ant Design
+
+### 代码规范
+- 使用函数式组件和 React Hooks
+- 组件名使用 PascalCase，文件名与组件名一致
+- 使用 TypeScript 接口定义 props 和 state
+- 优先使用 `const` 声明，避免 `let` 和 `var`
+- 使用 ES6+ 语法，如箭头函数、解构赋值等
+
+### 状态管理
+- 全局状态使用 Zustand store
+- 本地状态使用 `useState` 和 `useReducer`
+- 异步操作使用 `@tanstack/react-query`
+- 表单处理使用 `react-hook-form` + `yup` 验证
+
+### 样式规范
+- 使用 CSS Modules 或 styled-components
+- 响应式设计优先
+- 遵循 Ant Design 设计规范
+- 使用 CSS 变量管理主题色彩
+
+### 性能优化
+- 使用 `React.memo` 优化组件渲染
+- 使用 `useCallback` 和 `useMemo` 优化函数和计算
+- 大列表使用 `react-window` 虚拟化
+- 图片懒加载使用 `react-intersection-observer`
+
+### 错误处理
+- 使用 `react-error-boundary` 处理组件错误
+- API 调用使用 try-catch 和错误边界
+- 用户友好的错误提示
+
+### 测试规范
+- 组件需要可测试性
+- 使用 React Testing Library 进行测试
+- 测试文件命名：`ComponentName.test.tsx`
+description:
+globs:
+alwaysApply: true
+---

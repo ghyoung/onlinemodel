@@ -1,0 +1,164 @@
+## 数据库设计和一致性规范
+
+### 数据库选择
+- 主数据库：PostgreSQL 14+
+- 缓存数据库：Redis (可选)
+- 数据库版本管理：使用迁移脚本
+
+### 数据库设计一致性原则
+- **单一数据源**：数据库表结构是唯一的数据模型定义源
+- **前后端同步**：前端接口、后端模型、数据库表必须保持一致
+- **字段映射验证**：每次修改数据库后，必须验证前后端字段映射
+
+### 表设计规范
+- 表名使用 snake_case 命名
+- 主键统一使用 `id` 字段，类型为 BIGSERIAL
+- 时间字段使用 TIMESTAMP WITH TIME ZONE
+- 软删除使用 `deleted_at` 字段
+- 审计字段：`created_at`, `updated_at`, `created_by`, `updated_by`
+
+### 字段命名规范
+- 字段名使用 snake_case 命名
+- 布尔字段使用 `is_` 前缀
+- 外键字段使用 `表名_id` 格式
+- 枚举字段使用 `status`, `type` 等通用名称
+
+### 字段类型映射规范
+```sql
+-- 数据库字段类型与代码类型映射
+-- 字符串类型
+VARCHAR(50) -> string (前端) / string (后端)
+TEXT -> string (前端) / string (后端)
+
+-- 数字类型
+INTEGER -> number (前端) / number (后端)
+BIGINT -> number (前端) / number (后端)
+DECIMAL(10,2) -> number (前端) / number (后端)
+
+-- 布尔类型
+BOOLEAN -> boolean (前端) / boolean (后端)
+
+-- 时间类型
+TIMESTAMP WITH TIME ZONE -> string (前端) / Date (后端)
+DATE -> string (前端) / Date (后端)
+
+-- JSON类型
+JSONB -> object (前端) / object (后端)
+```
+
+### 前后端字段映射检查
+```typescript
+// 前端接口定义必须与数据库字段对应
+interface DataSource {
+  id: number;           // 对应数据库 id
+  name: string;         // 对应数据库 name
+  type: string;         // 对应数据库 type
+  connectionString: string; // 对应数据库 connection_string
+  isActive: boolean;    // 对应数据库 is_active
+  createdAt: string;    // 对应数据库 created_at
+  updatedAt: string;    // 对应数据库 updated_at
+}
+
+// 后端模型定义
+class DataSource {
+  id: number;
+  name: string;
+  type: string;
+  connectionString: string; // 映射到 connection_string
+  isActive: boolean;        // 映射到 is_active
+  createdAt: Date;          // 映射到 created_at
+  updatedAt: Date;          // 映射到 updated_at
+}
+```
+
+### 字段命名转换规则
+- 前端：camelCase (如：connectionString)
+- 后端：camelCase (如：connectionString)
+- 数据库：snake_case (如：connection_string)
+
+### 索引设计
+- 主键自动创建索引
+- 外键字段创建索引
+- 查询频繁的字段创建索引
+- 复合索引考虑查询顺序
+- 避免过多索引影响写入性能
+
+### SQL 编写规范
+- 使用参数化查询防止 SQL 注入
+- 复杂查询使用 CTE (Common Table Expressions)
+- 避免 SELECT *，明确指定字段
+- 使用 LIMIT 限制查询结果数量
+- 大表查询使用分页
+
+### 数据操作规范
+- 所有数据库操作放在 service 层
+- 使用事务确保数据一致性
+- 批量操作使用批量插入/更新
+- 删除操作优先使用软删除
+- 数据验证在应用层进行
+
+### 数据库修改流程
+1. **设计阶段**：设计数据库表结构和字段
+2. **验证阶段**：验证前后端字段映射关系
+3. **实现阶段**：创建数据库表，实现前后端代码
+4. **测试阶段**：验证数据一致性
+5. **文档阶段**：更新相关文档
+
+### 一致性检查清单
+- [ ] 数据库表名与业务实体名称一致
+- [ ] 数据库字段名与前端接口字段对应
+- [ ] 字段类型在前后端和数据库中一致
+- [ ] 必填字段在前后端都有验证
+- [ ] 默认值在数据库和代码中一致
+- [ ] 枚举值在数据库和代码中一致
+
+### 性能优化
+- 使用连接池管理数据库连接
+- 查询结果缓存策略
+- 定期分析慢查询
+- 数据库统计信息更新
+- 分区表处理大数据量
+
+### 备份和恢复
+- 定期数据库备份
+- 备份文件加密存储
+- 恢复流程测试
+- 监控备份状态
+
+### 安全规范
+- 数据库用户权限最小化
+- 敏感数据加密存储
+- 数据库访问日志记录
+- 定期安全审计
+
+### 禁止行为
+- ❌ 数据库字段名与业务含义不符
+- ❌ 前后端字段类型不一致
+- ❌ 跳过字段映射验证
+- ❌ 数据库修改后不更新代码
+
+### 推荐做法
+- ✅ 使用数据库迁移脚本管理表结构
+- ✅ 创建字段映射文档
+- ✅ 使用TypeScript接口确保类型安全
+- ✅ 定期进行一致性检查
+- ✅ 数据库修改后立即更新相关代码
+
+### 字段映射文档模板
+```markdown
+## 数据源表 (data_sources) 字段映射
+
+| 数据库字段 | 前端字段 | 后端字段 | 类型 | 说明 |
+|-----------|----------|----------|------|------|
+| id | id | id | number | 主键ID |
+| name | name | name | string | 数据源名称 |
+| type | type | type | string | 数据源类型 |
+| connection_string | connectionString | connectionString | string | 连接字符串 |
+| is_active | isActive | isActive | boolean | 是否激活 |
+| created_at | createdAt | createdAt | string/Date | 创建时间 |
+| updated_at | updatedAt | updatedAt | string/Date | 更新时间 |
+```
+description:
+globs:
+alwaysApply: true
+---

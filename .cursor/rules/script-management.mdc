@@ -1,0 +1,163 @@
+## 脚本分类管理规范
+
+### 脚本分类原则
+- **启动脚本**：用于启动开发环境、生产环境等
+- **功能脚本**：用于执行特定功能，如配置检查、数据库修复等
+- **工具脚本**：用于开发、测试、部署等辅助工具
+- **维护脚本**：用于系统维护、数据修复等
+
+### 脚本存放位置规范
+
+#### 1. 启动脚本 (Startup Scripts)
+- **位置**：项目根目录
+- **命名规范**：`start-{环境}.{bat|sh}`
+- **示例**：
+  - `start-dev.bat` - Windows开发环境启动
+  - `start-dev.sh` - Linux/Mac开发环境启动
+  - `start.bat` - Windows生产环境启动
+
+#### 2. 功能脚本 (Functional Scripts)
+- **位置**：`code/init-scripts/`
+- **命名规范**：`{功能名}.{js|mjs}`
+- **示例**：
+  - `check-config.js` - 配置检查脚本
+  - `fix-database.js` - 数据库修复脚本
+  - `test-api.js` - API测试脚本
+
+#### 3. 工具脚本 (Utility Scripts)
+- **位置**：`code/init-scripts/`
+- **命名规范**：`{工具名}.{js|mjs}`
+- **示例**：
+  - `setup-env.js` - 环境设置脚本
+  - `backup-db.js` - 数据库备份脚本
+  - `migrate-data.js` - 数据迁移脚本
+
+#### 4. 维护脚本 (Maintenance Scripts)
+- **位置**：`code/init-scripts/`
+- **命名规范**：`{维护类型}.{js|mjs}`
+- **示例**：
+  - `clean-logs.js` - 日志清理脚本
+  - `optimize-db.js` - 数据库优化脚本
+  - `health-check.js` - 健康检查脚本
+
+### 脚本调用方式
+
+#### 通过启动脚本调用
+```bash
+# Windows
+start-dev.bat fix-db      # 执行数据库修复
+start-dev.bat check       # 执行配置检查
+start-dev.bat test-api    # 测试API接口
+
+# Linux/Mac
+./start-dev.sh fix-db     # 执行数据库修复
+./start-dev.sh check      # 执行配置检查
+./start-dev.sh test-api   # 测试API接口
+```
+
+#### 通过npm脚本调用
+```bash
+cd code
+npm run fix-db           # 执行数据库修复
+npm run check-config     # 执行配置检查
+npm run test-api         # 测试API接口
+```
+
+#### 直接调用
+```bash
+cd code/init-scripts
+node fix-database.js     # 直接执行数据库修复
+node check-config.js     # 直接执行配置检查
+```
+
+### 脚本开发规范
+
+#### 1. 脚本结构
+```javascript
+// 1. 导入依赖
+import { required } from 'module';
+
+// 2. 配置信息
+const config = {
+  // 配置项
+};
+
+// 3. 主函数
+async function mainFunction() {
+  try {
+    // 主要逻辑
+  } catch (error) {
+    // 错误处理
+  }
+}
+
+// 4. 执行脚本
+mainFunction().catch(console.error);
+```
+
+#### 2. 错误处理
+- 使用 try-catch 包装主要逻辑
+- 提供详细的错误信息和解决建议
+- 记录错误日志
+- 优雅退出
+
+#### 3. 日志输出
+- 使用表情符号增强可读性
+- 提供进度指示
+- 显示执行结果
+- 包含时间戳
+
+#### 4. 配置管理
+- 从环境配置文件读取配置
+- 支持命令行参数
+- 提供默认值
+- 配置验证
+
+### 禁止行为
+- ❌ 在 `code/` 目录下创建启动脚本
+- ❌ 在 `code/backend/` 或 `code/frontend/` 下创建功能脚本
+- ❌ 脚本文件命名不规范
+- ❌ 脚本功能重复
+
+### 推荐做法
+- ✅ 使用根目录启动脚本 + 功能开关
+- ✅ 功能脚本统一放在 `code/init-scripts/` 目录
+- ✅ 脚本命名清晰，功能单一
+- ✅ 通过启动脚本调用功能脚本
+- ✅ 提供详细的错误信息和解决建议
+
+### 脚本分类示例
+
+#### 启动脚本 (根目录)
+```
+start-dev.bat          # Windows开发环境启动
+start-dev.sh           # Linux/Mac开发环境启动
+```
+
+#### 功能脚本 (code/init-scripts/)
+```
+check-config.js        # 配置检查
+check-config-simple.js # 简化配置检查
+fix-database.js        # 数据库修复
+test-api.js            # API测试
+test-db-connection.js  # 数据库连接测试
+```
+
+#### 工具脚本 (code/init-scripts/)
+```
+setup-env.js           # 环境设置
+backup-db.js           # 数据库备份
+migrate-data.js        # 数据迁移
+clean-logs.js          # 日志清理
+```
+
+### 脚本更新流程
+1. **创建脚本**：在 `code/init-scripts/` 目录下创建
+2. **添加功能开关**：在启动脚本中添加对应的功能开关
+3. **更新npm脚本**：在 `code/package.json` 中添加对应的npm脚本
+4. **测试验证**：确保脚本能正常执行
+5. **更新文档**：在相关文档中添加脚本使用说明
+description:
+globs:
+alwaysApply: false
+---
