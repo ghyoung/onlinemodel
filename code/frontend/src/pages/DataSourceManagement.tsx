@@ -17,7 +17,8 @@ import {
   Divider,
   Row,
   Col,
-  Statistic
+  Statistic,
+  Tabs
 } from 'antd'
 import {
   PlusOutlined,
@@ -29,11 +30,13 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
-  SyncOutlined
+  SyncOutlined,
+  TableOutlined
 } from '@ant-design/icons'
 import api from '@/config/api'
 import { getApiUrl } from '@/config/env'
 import { useAuthStore } from '@/stores/authStore'
+import DataSourceTables from '@/components/DataSourceTables'
 
 const { Option } = Select
 const { TextArea } = Input
@@ -99,6 +102,7 @@ const DataSourceManagement: React.FC = () => {
   const [editingDataSource, setEditingDataSource] = useState<DataSource | null>(null)
   const [form] = Form.useForm()
   const [stats, setStats] = useState<any>({})
+  const [viewingTables, setViewingTables] = useState<DataSource | null>(null)
   
   // 获取认证状态
   const { isAuthenticated, checkAuth } = useAuthStore()
@@ -401,6 +405,14 @@ const DataSourceManagement: React.FC = () => {
       key: 'actions',
       render: (record: DataSource) => (
         <Space size="small">
+          <Tooltip title="查看表">
+            <Button
+              type="text"
+              icon={<TableOutlined />}
+              size="small"
+              onClick={() => setViewingTables(record)}
+            />
+          </Tooltip>
           <Tooltip title="查看详情">
             <Button
               type="text"
@@ -669,6 +681,32 @@ const DataSourceManagement: React.FC = () => {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* 数据表列表模态框 */}
+      <Modal
+        title={
+          <Space>
+            <TableOutlined />
+            {viewingTables?.name} - 数据表列表
+          </Space>
+        }
+        open={!!viewingTables}
+        onCancel={() => setViewingTables(null)}
+        footer={null}
+        width={1200}
+        style={{ top: 20 }}
+      >
+        {viewingTables && (
+          <DataSourceTables
+            dataSourceId={viewingTables.id}
+            dataSourceName={viewingTables.name}
+            onRefresh={() => {
+              fetchDataSources()
+              fetchStats()
+            }}
+          />
+        )}
       </Modal>
     </div>
   )

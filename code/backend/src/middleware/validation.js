@@ -65,12 +65,12 @@ const dataSourceSchema = Joi.object({
   }),
   password: Joi.string().when('$isEdit', {
     is: true,
-    then: Joi.optional(),
+    then: Joi.optional().allow(''),
     otherwise: Joi.required()
   }).messages({
     'any.required': '密码不能为空'
   }),
-  connectionParams: Joi.string().max(1000).optional().messages({
+  connectionParams: Joi.string().max(1000).optional().allow('').messages({
     'string.max': '连接参数不能超过1000个字符'
   })
 });
@@ -152,6 +152,23 @@ export function validateId(req, res, next) {
   }
   req.params.id = id;
   next();
+}
+
+// 验证多个ID参数的中间件
+export function validateMultipleIds(paramNames) {
+  return (req, res, next) => {
+    for (const paramName of paramNames) {
+      const value = parseInt(req.params[paramName]);
+      if (isNaN(value) || value <= 0) {
+        return res.status(400).json({
+          error: '参数错误',
+          message: `${paramName}必须是正整数`
+        });
+      }
+      req.params[paramName] = value;
+    }
+    next();
+  };
 }
 
 export function validatePagination(req, res, next) {

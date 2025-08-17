@@ -115,6 +115,7 @@ async function createTables() {
         is_primary_key BOOLEAN DEFAULT false,
         default_value TEXT,
         description TEXT,
+        ordinal_position INTEGER DEFAULT 0,
         status VARCHAR(20) DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -258,6 +259,152 @@ async function insertInitialData() {
       }
       
       console.log('✅ 标准字段库初始化完成');
+    }
+    
+    // 检查数据源
+    const dataSourceCount = await client.query('SELECT COUNT(*) as count FROM data_sources');
+    
+    if (parseInt(dataSourceCount.rows[0].count) === 0) {
+      // 插入示例数据源
+      const adminUser = await client.query('SELECT id FROM users WHERE username = $1', ['admin']);
+      const adminId = adminUser.rows[0].id;
+      
+      const dataSources = [
+        {
+          name: 'MySQL主库',
+          description: '生产环境主数据库',
+          type: 'MYSQL',
+          connectionInfo: {
+            host: '192.168.1.100',
+            port: 3306,
+            database: 'production_db',
+            username: 'app_user',
+            password: 'encrypted_password',
+            connectionParams: 'useSSL=false&serverTimezone=UTC'
+          }
+        },
+        {
+          name: 'PostgreSQL仓库',
+          description: '数据仓库数据库',
+          type: 'POSTGRESQL',
+          connectionInfo: {
+            host: '192.168.1.101',
+            port: 5432,
+            database: 'data_warehouse',
+            username: 'warehouse_user',
+            password: 'encrypted_password',
+            connectionParams: 'sslmode=require'
+          }
+        },
+        {
+          name: 'Hive集群',
+          description: '大数据分析集群',
+          type: 'HIVE',
+          connectionInfo: {
+            host: '192.168.1.102',
+            port: 10000,
+            database: 'analytics',
+            username: 'hive_user',
+            password: 'encrypted_password',
+            connectionParams: 'transportMode=http&httpPath=cliservice'
+          }
+        }
+      ];
+      
+      for (const ds of dataSources) {
+        const result = await client.query(
+          'INSERT INTO data_sources (name, description, type, connection_info, created_by, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+          [ds.name, ds.description, ds.type, JSON.stringify(ds.connectionInfo), adminId, 'active']
+        );
+        
+        const dataSourceId = result.rows[0].id;
+        
+        // 为每个数据源插入示例表
+        const tables = [
+          {
+            tableName: 'users',
+            schemaName: 'public',
+            description: '用户信息表'
+          },
+          {
+            tableName: 'orders',
+            schemaName: 'public',
+            description: '订单信息表'
+          },
+          {
+            tableName: 'products',
+            schemaName: 'public',
+            description: '产品信息表'
+          },
+          {
+            tableName: 'categories',
+            schemaName: 'public',
+            description: '产品分类表'
+          },
+          {
+            tableName: 'user_logs',
+            schemaName: 'logs',
+            description: '用户行为日志表'
+          }
+        ];
+        
+        for (const table of tables) {
+          const tableResult = await client.query(
+            'INSERT INTO tables (data_source_id, table_name, schema_name, description, status) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [dataSourceId, table.tableName, table.schemaName, table.description, 'active']
+          );
+          
+          const tableId = tableResult.rows[0].id;
+          
+          // 为每个表插入示例字段
+          const columns = [
+            {
+              columnName: 'id',
+              dataType: 'INTEGER',
+              isNullable: false,
+              isPrimaryKey: true,
+              description: '主键ID'
+            },
+            {
+              columnName: 'name',
+              dataType: 'VARCHAR(100)',
+              isNullable: false,
+              isPrimaryKey: false,
+              description: '名称'
+            },
+            {
+              columnName: 'description',
+              dataType: 'TEXT',
+              isNullable: true,
+              isPrimaryKey: false,
+              description: '描述信息'
+            },
+            {
+              columnName: 'created_at',
+              dataType: 'TIMESTAMP',
+              isNullable: false,
+              isPrimaryKey: false,
+              description: '创建时间'
+            },
+            {
+              columnName: 'updated_at',
+              dataType: 'TIMESTAMP',
+              isNullable: true,
+              isPrimaryKey: false,
+              description: '更新时间'
+            }
+          ];
+          
+          for (const column of columns) {
+            await client.query(
+              'INSERT INTO columns (table_id, column_name, data_type, is_nullable, is_primary_key, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+              [tableId, column.columnName, column.dataType, column.isNullable, column.isPrimaryKey, column.description, 'active']
+            );
+          }
+        }
+      }
+      
+      console.log('✅ 示例数据源和表初始化完成');
     }
     
   } finally {
